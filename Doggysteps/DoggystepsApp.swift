@@ -8,6 +8,15 @@
 import SwiftUI
 import CoreMotion
 
+// MARK: - Pixel Theme Colors
+extension Color {
+    static let pixelGreen = Color(red: 0.4, green: 0.7, blue: 0.6)
+    static let pixelDarkGreen = Color(red: 0.2, green: 0.5, blue: 0.4)
+    static let pixelBeige = Color(red: 0.9, green: 0.85, blue: 0.7)
+    static let pixelDarkBeige = Color(red: 0.8, green: 0.75, blue: 0.6)
+    static let pixelBrown = Color(red: 0.4, green: 0.3, blue: 0.2)
+}
+
 // MARK: - Main App
 @main
 struct DoggystepsApp: App {
@@ -123,26 +132,57 @@ struct AppCoordinatorView: View {
         return !hasCompletedOnboarding || !hasValidProfile
     }
     
-    // MARK: - View Components
+    // MARK: - View Components - Modern Loading Screen
     private var loadingView: some View {
         ZStack {
+            // Clean background
             Color(.systemBackground)
                 .ignoresSafeArea()
             
-            VStack(spacing: 20) {
-                Image(systemName: "figure.walk")
-                    .font(.system(size: 60))
-                    .foregroundStyle(.blue.gradient)
+            VStack(spacing: 40) {
+                Spacer()
                 
-                Text("Doggysteps")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                // App icon with modern styling
+                VStack(spacing: 20) {
+                    // App icon
+                    Circle()
+                        .fill(.blue.opacity(0.1))
+                        .frame(width: 120, height: 120)
+                        .overlay {
+                            Image(systemName: "figure.walk")
+                                .font(.system(size: 50, weight: .medium))
+                                .foregroundColor(.blue)
+                        }
+                    
+                    // App title
+                    VStack(spacing: 8) {
+                        Text("Doggysteps")
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                            .foregroundColor(.primary)
+                        
+                        Text("Track your dog's daily adventures")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.secondary)
+                    }
+                }
                 
-                ProgressView()
-                    .scaleEffect(1.2)
-                    .tint(.blue)
+                Spacer()
+                
+                // Modern loading indicator
+                VStack(spacing: 16) {
+                    // Activity indicator
+                    ProgressView()
+                        .scaleEffect(1.2)
+                        .tint(.blue)
+                    
+                    Text("Loading...")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
             }
+            .padding(.horizontal, 32)
         }
     }
     

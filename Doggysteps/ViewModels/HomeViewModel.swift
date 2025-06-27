@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 import CoreMotion
+import UIKit
 
 // MARK: - Home View Model
 @MainActor
@@ -39,6 +40,10 @@ class HomeViewModel: ObservableObject {
     private let persistenceController = PersistenceController.shared
     private let notificationService = NotificationService.shared
     private let userDefaults = UserDefaults.standard
+    
+    // Date tracking for midnight reset
+    private var cancellables = Set<AnyCancellable>()
+    private var currentDate = Calendar.current.startOfDay(for: Date())
     
     // MARK: - Computed Properties
     var greeting: String {
@@ -138,10 +143,15 @@ class HomeViewModel: ObservableObject {
         return motionAuthorized && !isLoading
     }
     
+    var currentStreak: Int {
+        return calculateCurrentStreak()
+    }
+    
     // MARK: - Initialization
     init() {
         print("🏠 [HomeViewModel] Initializing home view model")
         setupInitialState()
+        setupDateChangeDetection()
         loadWalkSessions()
         
         Task {
@@ -253,12 +263,6 @@ class HomeViewModel: ObservableObject {
         motionAuthorized = CMPedometer.authorizationStatus() == .authorized
     }
     
-
-    
-
-    
-
-    
     // MARK: - Private Methods
     private func setupInitialState() {
         print("🏠 [HomeViewModel] Setting up initial state")
@@ -274,6 +278,51 @@ class HomeViewModel: ObservableObject {
         } else {
             print("❌ [HomeViewModel] Core Motion is NOT available on this device")
             error = .motionNotAvailable
+        }
+    }
+    
+    private func setupDateChangeDetection() {
+        print("🏠 [HomeViewModel] Setting up date change detection")
+        
+        // Listen for day changed notifications
+        NotificationCenter.default
+            .publisher(for: .NSCalendarDayChanged)
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.handleDateChange()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // Also listen for app becoming active (in case user opens app after midnight)
+        NotificationCenter.default
+            .publisher(for: UIApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.checkForDateChange()
+                }
+            }
+            .store(in: &cancellables)
+        
+        print("✅ [HomeViewModel] Date change detection setup complete")
+    }
+    
+    private func handleDateChange() async {
+        print("🕛 [HomeViewModel] Date changed - refreshing today's data")
+        currentDate = Calendar.current.startOfDay(for: Date())
+        
+        // Refresh today's data which will now show 0 steps for the new day
+        await refreshData()
+        
+        print("✅ [HomeViewModel] Data refreshed for new day")
+    }
+    
+    private func checkForDateChange() async {
+        let todayStartOfDay = Calendar.current.startOfDay(for: Date())
+        
+        if todayStartOfDay != currentDate {
+            print("🕛 [HomeViewModel] App became active - detected date change from \(currentDate) to \(todayStartOfDay)")
+            await handleDateChange()
         }
     }
     
@@ -414,6 +463,47 @@ class HomeViewModel: ObservableObject {
             todaysStepData = nil
             print("🏠 [HomeViewModel] No walk sessions today - cleared step data")
         }
+    }
+    
+    private func calculateCurrentStreak() -> Int {
+        guard !completedWalkSessions.isEmpty else { return 0 }
+        
+        let calendar = Calendar.current
+        var streak = 0
+        var currentDate = Date()
+        
+        // Start from today and work backwards
+        while true {
+            // Check if there's at least one walk session on this date
+            let hasWalkOnDate = completedWalkSessions.contains { walkSession in
+                calendar.isDate(walkSession.startTime, inSameDayAs: currentDate)
+            }
+            
+            if hasWalkOnDate {
+                streak += 1
+                // Move to previous day
+                guard let previousDay = calendar.date(byAdding: .day, value: -1, to: currentDate) else {
+                    break
+                }
+                currentDate = previousDay
+            } else {
+                // If we're checking today and there's no walk, streak is 0
+                // If we're checking a past day and there's no walk, streak stops here
+                break
+            }
+            
+            // Safety check to prevent infinite loop (max 365 days)
+            if streak >= 365 {
+                break
+            }
+        }
+        
+        return streak
+    }
+    
+    deinit {
+        cancellables.removeAll()
+        print("🏠 [HomeViewModel] HomeViewModel deinitialized")
     }
 }
 

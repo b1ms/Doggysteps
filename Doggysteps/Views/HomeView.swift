@@ -6,31 +6,35 @@
 //
 
 /*
- HomeView - Minimalist Black & White Dashboard
+ HomeView - Pixel Game Theme Dashboard
  
  Features Implemented:
- ✅ Personalized greeting with clean typography
+ ✅ Retro pixel game aesthetic
+ ✅ Green/teal color scheme with beige accents
+ ✅ Game-like inventory display for metrics
+ ✅ Pixelated progress bars and UI elements
+ ✅ 8-bit style typography and icons
+ ✅ Personalized greeting with pixel styling
  ✅ Dog steps today with breed-specific calculations
  ✅ Distance walked with metric/imperial support
- ✅ Minimalist progress circle with subtle animations
- ✅ Activity insights with clean presentation
- ✅ Weekly activity chart in monochrome
- ✅ Health status summary with minimal styling
- ✅ Clean monochromatic HealthKit integration
- ✅ Comprehensive error handling with subtle styling
- ✅ Responsive design with black & white aesthetics
+ ✅ Pixel progress circle with animations
+ ✅ Activity insights with game-style presentation
+ ✅ Weekly activity chart in pixel style
+ ✅ Health status summary with pixel styling
+ ✅ Comprehensive error handling with pixel aesthetics
+ ✅ Responsive design with pixel game aesthetics
  
  UI Components:
- - Header with greeting and minimal dog profile card
- - Today's activity summary with clean progress indicators
- - Minimalist circular progress chart
- - Activity insights with monochrome presentation
- - Clean stats cards (human steps, weekly average)
- - Weekly activity bar chart in black and white
- - Health status summary with subtle confidence indicators
- - Minimal action buttons with outline styling
- - Activity details sheet with clean data breakdown
- - Profile management sheet with minimal design
+ - Pixel header with greeting and dog profile card
+ - Today's activity summary with pixel progress indicators
+ - Pixelated circular progress chart
+ - Activity insights with pixel presentation
+ - Pixel stats cards (human steps, weekly average)
+ - Weekly activity bar chart in pixel style
+ - Health status summary with pixel confidence indicators
+ - Pixel action buttons with game styling
+ - Activity details sheet with pixel data breakdown
+ - Profile management sheet with pixel design
  */
 
 import SwiftUI
@@ -47,85 +51,80 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 32) {
-                    // Header with greeting and dog info
-                    headerSection
+                VStack(spacing: 20) {
+                    // Pixel header with greeting and dog info
+                    pixelHeaderSection
                     
                     if viewModel.motionAuthorized {
                         // Today's step summary
-                        todaysSummarySection
+                        pixelTodaysSummarySection
                         
-                        // Progress circle
-                        progressSection
+                        // Pixel progress section
+                        pixelProgressSection
                         
                         // Activity insights
-                        activityInsightsSection
+                        pixelActivityInsightsSection
                         
                         // Quick stats
-                        quickStatsSection
+                        pixelQuickStatsSection
                         
                         // Weekly chart
                         if !viewModel.weeklyStepData.isEmpty {
-                            weeklyChartSection
+                            pixelWeeklyChartSection
                         }
                         
                         // Health status summary
-                        healthStatusSection
+                        pixelHealthStatusSection
                     } else {
                         // Core Motion authorization prompt
-                        motionPromptSection
+                        pixelMotionPromptSection
                     }
                     
                     // Action buttons
-                    actionButtonsSection
+                    pixelActionButtonsSection
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 16)
                 .refreshable {
                     await viewModel.refreshData()
                 }
             }
-            .background(Color(.systemBackground))
-            .navigationTitle("Doggysteps")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        viewModel.showingReminderSettings = true
-                    }) {
-                        Image(systemName: "bell")
-                            .font(.title2)
-                            .foregroundStyle(.primary)
-                    }
+            .background(
+                LinearGradient(
+                    colors: [Color.pixelGreen, Color.pixelDarkGreen],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+            .navigationTitle("")
+            .navigationBarHidden(true)
+        }
+        .overlay(alignment: .top) {
+            // Pixel navigation header
+            pixelNavigationHeader
+        }
+        .sheet(isPresented: $viewModel.showingProfile) {
+            ProfileView()
+        }
+        .sheet(isPresented: $viewModel.showingReminderSettings) {
+            ReminderSettingsView()
+        }
+        .sheet(isPresented: $showingActivityDetails) {
+            ActivityDetailsView(stepData: viewModel.weeklyStepData)
+        }
+        .alert("Motion Access", isPresented: .constant(viewModel.error != nil)) {
+            Button("Settings") {
+                if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(settingsUrl)
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    profileButton
-                }
             }
-            .sheet(isPresented: $viewModel.showingProfile) {
-                ProfileView()
+            Button("Cancel", role: .cancel) { 
+                viewModel.clearError()
             }
-            .sheet(isPresented: $viewModel.showingReminderSettings) {
-                ReminderSettingsView()
-            }
-            .sheet(isPresented: $showingActivityDetails) {
-                ActivityDetailsView(stepData: viewModel.weeklyStepData)
-            }
-            .alert("Motion Access", isPresented: .constant(viewModel.error != nil)) {
-                Button("Settings") {
-                    if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(settingsUrl)
-                    }
-                }
-                Button("Cancel", role: .cancel) { 
-                    viewModel.clearError()
-                }
-            } message: {
-                Text(viewModel.error?.errorDescription ?? "")
-            }
+        } message: {
+            Text(viewModel.error?.errorDescription ?? "")
         }
         .onAppear {
-            print("🏠 [HomeView] Home view appeared")
+            print("🏠 [HomeView] Pixel Home view appeared")
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             print("🏠 [HomeView] App became active, checking motion status")
@@ -133,150 +132,253 @@ struct HomeView: View {
         }
     }
     
-    // MARK: - View Components
-    private var headerSection: some View {
+    // MARK: - Pixel Navigation Header
+    private var pixelNavigationHeader: some View {
+        HStack {
+            // Notifications button (LB)
+            Button(action: { viewModel.showingReminderSettings = true }) {
+                Text("LB")
+                    .font(.system(size: 12, weight: .bold, design: .monospaced))
+                    .foregroundColor(.white)
+                    .frame(width: 32, height: 20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.pixelBrown)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(.black, lineWidth: 1)
+                            )
+                    )
+            }
+            
+            Spacer()
+            
+            // App title
+            LogoView()
+            
+            Spacer()
+            
+            // Profile button (RB)
+            Button(action: { viewModel.showingProfile = true }) {
+                Text("RB")
+                    .font(.system(size: 12, weight: .bold, design: .monospaced))
+                    .foregroundColor(.white)
+                    .frame(width: 32, height: 20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.pixelBrown)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(.black, lineWidth: 1)
+                            )
+                    )
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 60)
+    }
+    
+    // MARK: - Pixel View Components
+    private var pixelHeaderSection: some View {
         VStack(spacing: 20) {
             // Greeting
             VStack(spacing: 8) {
                 Text(viewModel.greeting)
-                    .font(.title2)
-                    .fontWeight(.light)
-                    .foregroundStyle(.primary)
+                    .font(.system(size: 18, weight: .medium, design: .monospaced))
+                    .foregroundColor(.white)
                     .multilineTextAlignment(.center)
-                    .tracking(0.5)
+                    .shadow(color: .black.opacity(0.3), radius: 0, x: 1, y: 1)
             }
+            .padding(.top, 20)
             
             // Dog info card
             if let dogProfile = viewModel.dogProfile {
-                dogInfoCard(dogProfile)
+                pixelDogInfoCard(dogProfile)
             }
         }
     }
     
-    private func dogInfoCard(_ profile: DogProfile) -> some View {
+    private func pixelDogInfoCard(_ profile: DogProfile) -> some View {
         HStack(spacing: 16) {
             // Dog avatar
-            Image(systemName: "pawprint.circle")
+            Image(systemName: "pawprint.circle.fill")
                 .font(.system(size: 32))
-                .foregroundStyle(.primary)
+                .foregroundColor(Color.pixelBeige)
+                .background(
+                    Circle()
+                        .fill(Color.pixelDarkGreen)
+                        .frame(width: 44, height: 44)
+                        .overlay(
+                            Circle()
+                                .stroke(.black.opacity(0.3), lineWidth: 1)
+                        )
+                )
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(profile.name)
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.primary)
+                    .font(.system(size: 16, weight: .bold, design: .monospaced))
+                    .foregroundColor(Color.pixelBrown)
                 
-                                        Text("\(profile.breedName) • \(profile.bodyCondition.rawValue)")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    .tracking(0.3)
+                Text("\(profile.breedName) • \(profile.bodyCondition.rawValue)")
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundColor(Color.pixelBrown.opacity(0.8))
             }
             
             Spacer()
             
             // Motion status
             VStack(spacing: 6) {
-                Image(systemName: viewModel.motionAuthorized ? "checkmark.circle" : "exclamationmark.circle")
+                Image(systemName: viewModel.motionAuthorized ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
                     .font(.title3)
-                    .foregroundStyle(viewModel.motionAuthorized ? .primary : .secondary)
+                    .foregroundColor(viewModel.motionAuthorized ? .green : .red)
                 
                 Text(viewModel.motionAuthorized ? "Connected" : "Disconnected")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .tracking(0.5)
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .foregroundColor(Color.pixelBrown)
             }
         }
-        .padding(20)
+        .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(.secondary.opacity(0.2), lineWidth: 1)
-                .fill(Color(.systemGray6).opacity(0.1))
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.pixelBeige)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.pixelDarkBeige, lineWidth: 2)
+                )
+                .shadow(color: .black.opacity(0.2), radius: 0, x: 2, y: 2)
         )
     }
     
-    private var todaysSummarySection: some View {
+    private var pixelTodaysSummarySection: some View {
         VStack(spacing: 16) {
             HStack {
-                Text("Today's Activity")
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.primary)
-                    .tracking(0.5)
+                Text("📦 TODAY'S ACTIVITY")
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .foregroundColor(.white)
                 Spacer()
             }
             
             if let stepData = viewModel.todaysStepData {
-                todaysSummaryCard(stepData)
+                pixelTodaysSummaryCard(stepData)
             } else if viewModel.isLoading {
-                loadingCard
+                pixelLoadingCard
             } else {
-                noDataCard
+                pixelNoDataCard
             }
         }
     }
     
-    private func todaysSummaryCard(_ stepData: StepData) -> some View {
+    private func pixelTodaysSummaryCard(_ stepData: StepData) -> some View {
         VStack(spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
+            // Main metrics row
+            HStack(spacing: 16) {
+                // Dog Steps
+                VStack(spacing: 4) {
+                    Text("🐕")
+                        .font(.title2)
                     Text("\(stepData.estimatedDogSteps)")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.primary)
-                    
+                        .font(.system(size: 20, weight: .bold, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown)
                     Text("Dog Steps")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown.opacity(0.8))
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.pixelBeige.opacity(0.7))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.pixelDarkBeige, lineWidth: 1)
+                        )
+                )
+                
+                // Distance
+                VStack(spacing: 4) {
+                    Text("🗺️")
+                        .font(.title2)
+                    Text(String(format: "%.1f km", stepData.distanceInKilometers))
+                        .font(.system(size: 20, weight: .bold, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown)
+                    Text("Distance")
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown.opacity(0.8))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.pixelBeige.opacity(0.7))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.pixelDarkBeige, lineWidth: 1)
+                        )
+                )
+            }
+            
+            // Pixel progress bar
+            pixelProgressBar(progress: stepData.goalProgress, percentage: stepData.goalProgressPercentage)
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.pixelBeige)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.pixelDarkBeige, lineWidth: 2)
+                )
+        )
+    }
+    
+    private func pixelProgressBar(progress: Double, percentage: Int) -> some View {
+        VStack(spacing: 8) {
+            HStack {
+                Text("Daily Goal Progress")
+                    .font(.system(size: 12, weight: .bold, design: .monospaced))
+                    .foregroundColor(Color.pixelBrown)
                 
                 Spacer()
                 
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text(String(format: "%.1f km", stepData.distanceInKilometers))
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.primary)
-                    
-                    Text("Distance")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
+                Text("\(percentage)%")
+                    .font(.system(size: 12, weight: .bold, design: .monospaced))
+                    .foregroundColor(Color.pixelBrown)
             }
             
-            // Progress bar
-            VStack(spacing: 8) {
-                HStack {
-                    Text("Daily Goal")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    Spacer()
-                    
-                    Text("\(stepData.goalProgressPercentage)%")
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.primary)
-                }
+            // Pixelated progress bar
+            GeometryReader { geometry in
+                let progressClamped = min(max(progress, 0), 1.0)
+                let filledSegments = Int(progressClamped * 15)
                 
-                ProgressView(value: stepData.goalProgress)
-                    .progressViewStyle(.linear)
-                    .scaleEffect(y: 3)
-                    .animation(.easeInOut(duration: 1.0), value: stepData.goalProgress)
+                HStack(spacing: 2) {
+                    // Progress segments (filled)
+                    ForEach(0..<filledSegments, id: \.self) { _ in
+                        Rectangle()
+                            .fill(Color.pixelDarkGreen)
+                            .frame(height: 8)
+                    }
+                    
+                    // Empty segments (remaining)
+                    ForEach(filledSegments..<15, id: \.self) { _ in
+                        Rectangle()
+                            .fill(Color.pixelDarkBeige)
+                            .frame(height: 8)
+                    }
+                }
             }
+            .frame(height: 8)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
         }
-        .padding()
-        .background(.quaternary.opacity(0.5))
-        .cornerRadius(16)
     }
     
-    private var loadingCard: some View {
+    private var pixelLoadingCard: some View {
         VStack(spacing: 16) {
             ProgressView()
                 .scaleEffect(1.2)
             
             Text("Loading today's activity...")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundColor(Color.pixelBrown)
         }
         .frame(height: 100)
         .frame(maxWidth: .infinity)
@@ -284,15 +386,15 @@ struct HomeView: View {
         .cornerRadius(16)
     }
     
-    private var noDataCard: some View {
+    private var pixelNoDataCard: some View {
         VStack(spacing: 16) {
             Image(systemName: "figure.walk")
                 .font(.system(size: 40))
-                .foregroundStyle(.gray)
+                .foregroundColor(.gray)
             
             Text("No activity data yet")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundColor(Color.pixelBrown.opacity(0.8))
             
             if !viewModel.motionAuthorized {
                 VStack(spacing: 12) {
@@ -309,7 +411,7 @@ struct HomeView: View {
                         }
                     }
                     .buttonStyle(.bordered)
-                    .foregroundStyle(.blue)
+                    .foregroundColor(Color.pixelBrown)
                 }
             }
         }
@@ -319,11 +421,11 @@ struct HomeView: View {
         .cornerRadius(16)
     }
     
-    private var progressSection: some View {
+    private var pixelProgressSection: some View {
         VStack(spacing: 16) {
             Text("Daily Progress")
-                .font(.headline)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                .foregroundColor(Color.pixelBrown)
             
             ZStack {
                 Circle()
@@ -339,86 +441,240 @@ struct HomeView: View {
                 
                 VStack(spacing: 4) {
                     Text("\(viewModel.todaysProgressPercentage)%")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.primary)
+                        .font(.system(size: 20, weight: .bold, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown)
                     
                     Text("of goal")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown.opacity(0.8))
                 }
             }
         }
     }
     
-    private var quickStatsSection: some View {
-        VStack(spacing: 16) {
-            Text("Quick Stats")
-                .font(.headline)
-                .frame(maxWidth: .infinity, alignment: .leading)
+    private var pixelQuickStatsSection: some View {
+        VStack(spacing: 20) {
+            // Main step count display (like temperature)
+            if let stepData = viewModel.todaysStepData {
+                VStack(spacing: 8) {
+                    HStack(alignment: .bottom, spacing: 4) {
+                        Text("\(stepData.estimatedDogSteps)")
+                            .font(.system(size: 72, weight: .thin))
+                            .foregroundColor(.primary)
+                        
+                        Text("steps")
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 8)
+                    }
+                    
+                    Text("\(stepData.goalProgressPercentage)% of daily goal")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+                .padding(.bottom, 20)
+            }
             
-            HStack(spacing: 16) {
-                statCard(
-                    title: "Human Steps",
-                    value: "\(viewModel.todaysStepData?.humanSteps ?? 0)",
-                    icon: "figure.walk",
-                    color: .green
-                )
+            // Weather-style metrics grid
+            VStack(spacing: 16) {
+                // Row 1
+                HStack {
+                    // Distance metric
+                    HStack(spacing: 12) {
+                        Image(systemName: "location.fill")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 20)
+                        
+                        if let stepData = viewModel.todaysStepData {
+                            Text(String(format: "%.1f mi", stepData.distanceInKilometers * 0.621371))
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
+                        } else {
+                            Text("0.0 mi")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
+                        }
+                        
+                        Spacer()
+                        
+                        Text("DISTANCE")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .tracking(0.5)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
                 
-                statCard(
-                    title: "Weekly Avg",
-                    value: "\(viewModel.weeklyAverage)",
-                    icon: "chart.line.uptrend.xyaxis",
-                    color: .orange
-                )
+                // Row 2
+                HStack {
+                    // Active time metric
+                    HStack(spacing: 12) {
+                        Image(systemName: "clock.fill")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 20)
+                        
+                        if let stepData = viewModel.todaysStepData {
+                            Text(formatActiveTime(minutes: Int(stepData.distanceInKilometers * 12))) // Rough estimate
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
+                        } else {
+                            Text("0 min")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
+                        }
+                        
+                        Spacer()
+                        
+                        Text("ACTIVE TIME")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .tracking(0.5)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                // Row 3
+                HStack {
+                    // Human steps metric
+                    HStack(spacing: 12) {
+                        Image(systemName: "figure.walk")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 20)
+                        
+                        Text("\(viewModel.todaysStepData?.humanSteps ?? 0)")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        Text("HUMAN STEPS")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .tracking(0.5)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                // Row 4
+                HStack {
+                    // Weekly average metric
+                    HStack(spacing: 12) {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 20)
+                        
+                        Text("\(viewModel.weeklyAverage)")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        Text("WEEKLY AVG")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .tracking(0.5)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                // Row 5
+                HStack {
+                    // Goal progress metric
+                    HStack(spacing: 12) {
+                        Image(systemName: "target")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 20)
+                        
+                        if let stepData = viewModel.todaysStepData {
+                            Text("\(stepData.goalProgressPercentage)%")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
+                        } else {
+                            Text("0%")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
+                        }
+                        
+                        Spacer()
+                        
+                        Text("GOAL PROGRESS")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .tracking(0.5)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                // Row 6
+                HStack {
+                    // Motion status metric
+                    HStack(spacing: 12) {
+                        Image(systemName: viewModel.motionAuthorized ? "sensor.tag.radiowaves.forward.fill" : "sensor.tag.radiowaves.forward")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 20)
+                        
+                        Text(viewModel.motionAuthorized ? "Connected" : "Disconnected")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        Text("MOTION SENSOR")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .tracking(0.5)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
+        .padding(24)
+        .background(.regularMaterial)
+        .cornerRadius(16)
+    }
+    
+    // Helper function for formatting active time
+    private func formatActiveTime(minutes: Int) -> String {
+        if minutes < 60 {
+            return "\(minutes) min"
+        } else {
+            let hours = minutes / 60
+            let mins = minutes % 60
+            if mins == 0 {
+                return "\(hours) hr"
+            } else {
+                return "\(hours)h \(mins)m"
             }
         }
     }
     
-    private func statCard(title: String, value: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(color.gradient)
-            
-            VStack(spacing: 4) {
-                Text(value)
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primary)
-                
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(.ultraThinMaterial)
-        .cornerRadius(12)
-    }
-    
-    private var weeklyChartSection: some View {
+    private var pixelWeeklyChartSection: some View {
         VStack(spacing: 16) {
             HStack {
                 Text("Weekly Activity")
-                    .font(.headline)
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
                 
                 Spacer()
                 
                 Button("View Details") {
                     showingActivityDetails = true
                 }
-                .font(.caption)
-                .foregroundStyle(.blue)
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .foregroundColor(.blue)
             }
             
             // Simple bar chart representation
-            weeklyChart
+            pixelWeeklyChart
         }
     }
     
-    private var weeklyChart: some View {
+    private var pixelWeeklyChart: some View {
         HStack(alignment: .bottom, spacing: 8) {
             ForEach(Array(viewModel.weeklyStepData.prefix(7).enumerated()), id: \.offset) { index, stepData in
                 VStack(spacing: 4) {
@@ -428,8 +684,8 @@ struct HomeView: View {
                         .animation(.easeInOut(duration: 0.8).delay(Double(index) * 0.1), value: stepData.estimatedDogSteps)
                     
                     Text(dayOfWeek(from: stepData.date))
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown.opacity(0.8))
                 }
             }
         }
@@ -441,29 +697,29 @@ struct HomeView: View {
     
     // MARK: - Enhanced Phase 4 Sections
     
-    private var activityInsightsSection: some View {
+    private var pixelActivityInsightsSection: some View {
         VStack(spacing: 16) {
             HStack {
                 Text("Activity Insights")
-                    .font(.headline)
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
                 
                 Spacer()
                 
                 Text(viewModel.activityTrend.emoji)
-                    .font(.title2)
+                    .font(.system(size: 20))
             }
             
             VStack(spacing: 12) {
                 ForEach(viewModel.activityInsights.prefix(3), id: \.message) { insight in
                     HStack(spacing: 12) {
                         Image(systemName: insightIcon(for: insight))
-                            .font(.title3)
-                            .foregroundStyle(insightColor(for: insight))
+                            .font(.system(size: 20))
+                            .foregroundColor(insightColor(for: insight))
                             .frame(width: 24)
                         
                         Text(insight.message)
-                            .font(.subheadline)
-                            .foregroundStyle(.primary)
+                            .font(.system(size: 12, weight: .medium, design: .monospaced))
+                            .foregroundColor(Color.pixelBrown)
                             .multilineTextAlignment(.leading)
                         
                         Spacer()
@@ -476,8 +732,8 @@ struct HomeView: View {
                 
                 if viewModel.activityInsights.isEmpty {
                     Text("Get more activity data to see personalized insights!")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown.opacity(0.8))
                         .italic()
                         .padding()
                 }
@@ -485,11 +741,11 @@ struct HomeView: View {
         }
     }
     
-    private var healthStatusSection: some View {
+    private var pixelHealthStatusSection: some View {
         VStack(spacing: 16) {
             Text("Health Summary")
-                .font(.headline)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                .foregroundColor(Color.pixelBrown)
             
             VStack(spacing: 16) {
                 // Today's summary
@@ -497,18 +753,18 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("Today's Assessment")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
+                                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                                .foregroundColor(Color.pixelBrown)
                             
                             Spacer()
                             
                             Text(stepData.activityEmoji)
-                                .font(.title2)
+                                .font(.system(size: 20))
                         }
                         
                         Text(viewModel.motionStatusSummary)
-                            .font(.callout)
-                            .foregroundStyle(.primary)
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundColor(Color.pixelBrown)
                             .padding(.top, 4)
                     }
                     .padding()
@@ -519,12 +775,12 @@ struct HomeView: View {
                 // Weekly trend
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Weekly Trend")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown)
                     
                     Text(viewModel.weeklyStepTrend)
-                        .font(.callout)
-                        .foregroundStyle(.primary)
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown)
                 }
                 .padding()
                 .background(.blue.opacity(0.1))
@@ -534,19 +790,19 @@ struct HomeView: View {
                 if let stepData = viewModel.todaysStepData {
                     HStack {
                         Text("Data Confidence:")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundColor(Color.pixelBrown.opacity(0.8))
                         
                         Text(stepData.confidenceEmoji)
                         Text(stepData.confidence)
-                            .font(.caption)
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
                             .fontWeight(.medium)
                         
                         Spacer()
                         
                         Text("Quality: \(stepData.confidence)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundColor(Color.pixelBrown.opacity(0.8))
                     }
                     .padding(.horizontal)
                 }
@@ -554,21 +810,20 @@ struct HomeView: View {
         }
     }
     
-    private var motionPromptSection: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "figure.walk.circle")
-                .font(.system(size: 60))
-                .foregroundStyle(.blue.gradient)
+    private var pixelMotionPromptSection: some View {
+                 VStack(spacing: 20) {
+             Image(systemName: "figure.walk.circle")
+                 .font(.system(size: 60))
+                 .foregroundColor(.blue)
             
             VStack(spacing: 12) {
                 Text("Enable Step Tracking")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .font(.system(size: 18, weight: .bold, design: .monospaced))
+                    .foregroundColor(Color.pixelBrown)
                 
                 Text("Allow motion access to track your walks and calculate your dog's steps during active walk sessions.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundColor(Color.pixelBrown.opacity(0.8))
                     .multilineTextAlignment(.center)
             }
             
@@ -585,8 +840,8 @@ struct HomeView: View {
             }
             
             Text("Step counting only works during active walk sessions - no background tracking.")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .foregroundColor(Color.pixelBrown.opacity(0.8))
                 .multilineTextAlignment(.center)
         }
         .padding()
@@ -618,7 +873,7 @@ struct HomeView: View {
         }
     }
     
-    private var actionButtonsSection: some View {
+    private var pixelActionButtonsSection: some View {
         VStack(spacing: 16) {
             if viewModel.motionAuthorized {
                 // Authorized action buttons
@@ -641,7 +896,7 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(.blue)
-                        .foregroundStyle(.white)
+                        .foregroundColor(.white)
                         .cornerRadius(12)
                     }
                     .disabled(viewModel.isLoading)
@@ -653,19 +908,19 @@ struct HomeView: View {
                 VStack(spacing: 8) {
                     if let lastUpdate = viewModel.lastUpdateTime {
                         Text("Last updated: \(lastUpdate, style: .time)")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundColor(Color.pixelBrown.opacity(0.8))
                     }
                     
                     HStack(spacing: 16) {
                         Label("HealthKit Connected", systemImage: "checkmark.circle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.green)
+                            .font(.system(size: 12))
+                            .foregroundColor(.green)
                         
                         if let stepData = viewModel.todaysStepData {
                             Label("\(stepData.confidence) Confidence", systemImage: "info.circle")
-                                .font(.caption)
-                                .foregroundStyle(.blue)
+                                .font(.system(size: 12))
+                                .foregroundColor(.blue)
                         }
                     }
                 }
@@ -691,19 +946,10 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity)
                     
                     Text("Enable step tracking and walk reminders for your dog")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown.opacity(0.8))
                 }
             }
-        }
-    }
-    
-    private var profileButton: some View {
-        Button(action: {
-            viewModel.showingProfile = true
-        }) {
-            Image(systemName: "person.circle")
-                .font(.title2)
         }
     }
     
@@ -746,50 +992,52 @@ struct ActivityDetailsView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(data.formattedDate)
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
                 
                 Spacer()
                 
                 Text(data.activityEmoji)
-                    .font(.title2)
+                    .font(.system(size: 20))
             }
             
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text("Dog Steps:")
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(Color.pixelBrown.opacity(0.8))
                     Spacer()
                     Text("\(data.estimatedDogSteps)")
-                        .fontWeight(.medium)
+                        .font(.system(size: 16, weight: .bold, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown)
                 }
                 
                 HStack {
                     Text("Human Steps:")
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(Color.pixelBrown.opacity(0.8))
                     Spacer()
                     Text("\(data.humanSteps)")
-                        .fontWeight(.medium)
+                        .font(.system(size: 16, weight: .bold, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown)
                 }
                 
                 HStack {
                     Text("Distance:")
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(Color.pixelBrown.opacity(0.8))
                     Spacer()
                     Text(String(format: "%.1f km", data.distanceInKilometers))
-                        .fontWeight(.medium)
+                        .font(.system(size: 16, weight: .bold, design: .monospaced))
+                        .foregroundColor(Color.pixelBrown)
                 }
                 
                 HStack {
                     Text("Goal Progress:")
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(Color.pixelBrown.opacity(0.8))
                     Spacer()
                     Text("\(data.goalProgressPercentage)%")
-                        .fontWeight(.medium)
-                        .foregroundStyle(data.isGoalMet ? .green : .primary)
+                        .font(.system(size: 16, weight: .bold, design: .monospaced))
+                        .foregroundColor(data.isGoalMet ? .green : .primary)
                 }
             }
-            .font(.subheadline)
+            .font(.system(size: 12, weight: .medium, design: .monospaced))
         }
         .padding()
         .background(.ultraThinMaterial)
@@ -809,15 +1057,13 @@ struct ProfileSheetView: View {
                     VStack(spacing: 16) {
                         Image(systemName: "pawprint.circle.fill")
                             .font(.system(size: 80))
-                            .foregroundStyle(.blue.gradient)
+                            .foregroundColor(Color.pixelBeige)
                         
                         Text(profile.name)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
+                            .font(.system(size: 18, weight: .bold, design: .monospaced))
                         
                         Text("\(profile.breedName) • \(profile.bodyCondition.rawValue)")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 12, weight: .medium, design: .monospaced))
                     }
                 }
                 

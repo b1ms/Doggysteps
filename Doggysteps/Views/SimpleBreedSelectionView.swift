@@ -58,19 +58,38 @@ struct SimpleBreedSelectionView: View {
     // MARK: - View Components
     private var headerSection: some View {
         VStack(spacing: 16) {
-            Image(systemName: "pawprint.fill")
-                .font(.system(size: 50))
-                .foregroundStyle(.blue.gradient)
+            // Pixel-style paw icon
+            VStack(spacing: 8) {
+                Image(systemName: "pawprint.fill")
+                    .font(.system(size: 50, weight: .bold, design: .monospaced))
+                    .foregroundStyle(Color.pixelBrown)
+                
+                // Pixel decorative elements
+                HStack(spacing: 2) {
+                    ForEach(0..<5) { _ in
+                        Rectangle()
+                            .fill(Color.pixelDarkGreen)
+                            .frame(width: 8, height: 8)
+                    }
+                }
+            }
+            .padding()
+            .background(Color.pixelBeige)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.pixelDarkBeige, lineWidth: 2)
+            )
             
             VStack(spacing: 8) {
-                Text("Choose Your Dog's Breed")
-                    .font(.title2)
+                Text("CHOOSE YOUR DOG'S BREED")
+                    .font(.system(.title2, design: .monospaced))
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(Color.pixelBrown)
                 
                 Text("This helps us calculate accurate step counts")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.system(.subheadline, design: .monospaced))
+                    .foregroundStyle(Color.pixelBrown.opacity(0.8))
                     .multilineTextAlignment(.center)
             }
         }
@@ -79,13 +98,20 @@ struct SimpleBreedSelectionView: View {
     private var searchSection: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.pixelBrown.opacity(0.6))
+                .font(.system(.body, design: .monospaced))
             
             TextField("Search breeds...", text: $searchText)
+                .font(.system(.body, design: .monospaced))
+                .foregroundStyle(Color.pixelBrown)
         }
         .padding()
-        .background(.quaternary.opacity(0.5))
-        .cornerRadius(12)
+        .background(Color.pixelBeige.opacity(0.8))
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.pixelDarkBeige, lineWidth: 1)
+        )
     }
     
     private var breedListSection: some View {
@@ -102,23 +128,29 @@ struct SimpleBreedSelectionView: View {
     private func breedRow(_ breed: String) -> some View {
         HStack {
             Image(systemName: "pawprint")
-                .foregroundStyle(.blue)
+                .foregroundStyle(Color.pixelDarkGreen)
+                .font(.system(.body, design: .monospaced))
                 .frame(width: 24)
             
             Text(breed)
-                .font(.headline)
-                .foregroundStyle(.primary)
+                .font(.system(.headline, design: .monospaced))
+                .foregroundStyle(Color.pixelBrown)
             
             Spacer()
             
             if selectedBreedName == breed {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(Color.pixelDarkGreen)
+                    .font(.system(.body, design: .monospaced))
             }
         }
         .padding()
-        .background(selectedBreedName == breed ? .blue.opacity(0.1) : .clear)
-        .cornerRadius(12)
+        .background(selectedBreedName == breed ? Color.pixelBeige : Color.pixelBeige.opacity(0.3))
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(selectedBreedName == breed ? Color.pixelDarkGreen : Color.pixelDarkBeige.opacity(0.5), lineWidth: 1)
+        )
         .onTapGesture {
             selectBreed(breed)
         }

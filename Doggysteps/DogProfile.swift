@@ -32,6 +32,13 @@ enum DogGender: String, CaseIterable, Codable {
         case .girl: return "♀️"
         }
     }
+    
+    var description: String {
+        switch self {
+        case .boy: return "He/him pronouns"
+        case .girl: return "She/her pronouns"
+        }
+    }
 }
 
 // MARK: - Dog Body Condition Enum

@@ -35,10 +35,6 @@ class OnboardingViewModel: ObservableObject {
         withAnimation(.easeInOut(duration: 0.3)) {
             switch currentStep {
             case .welcome:
-                currentStep = .permissions
-                print("🐕 [OnboardingViewModel] Moving to permissions step")
-                
-            case .permissions:
                 currentStep = .breedSelection
                 print("🐕 [OnboardingViewModel] Moving to breed selection step")
                 
@@ -66,13 +62,9 @@ class OnboardingViewModel: ObservableObject {
             case .welcome:
                 break // Can't go back from welcome
                 
-            case .permissions:
+            case .breedSelection:
                 currentStep = .welcome
                 print("🐕 [OnboardingViewModel] Moving back to welcome step")
-                
-            case .breedSelection:
-                currentStep = .permissions
-                print("🐕 [OnboardingViewModel] Moving back to permissions step")
                 
             case .dogName:
                 currentStep = .breedSelection
@@ -118,9 +110,6 @@ class OnboardingViewModel: ObservableObject {
         switch currentStep {
         case .welcome:
             return true
-            
-        case .permissions:
-            return true // For now, assume permissions are handled
             
         case .breedSelection:
             return !selectedBreed.isEmpty
@@ -204,7 +193,6 @@ class OnboardingViewModel: ObservableObject {
 // MARK: - Onboarding Step Enum
 enum OnboardingStep: CaseIterable {
     case welcome
-    case permissions
     case breedSelection
     case dogName
     case dogGender
@@ -213,9 +201,7 @@ enum OnboardingStep: CaseIterable {
     var title: String {
         switch self {
         case .welcome:
-            return "Welcome to Doggysteps"
-        case .permissions:
-            return "Health Permissions"
+            return "Welcome to Doggy🐾Steps"
         case .breedSelection:
             return "Choose Breed"
         case .dogName:
@@ -231,8 +217,6 @@ enum OnboardingStep: CaseIterable {
         switch self {
         case .welcome:
             return "Track your dog's daily steps and activity"
-        case .permissions:
-            return "We need access to your health data to track steps"
         case .breedSelection:
             return "Select your dog's breed for accurate step calculations"
         case .dogName:

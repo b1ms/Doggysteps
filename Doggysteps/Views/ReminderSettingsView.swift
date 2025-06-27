@@ -6,14 +6,15 @@
 //
 
 /*
- Phase 5 Complete: ReminderSettingsView for Walk Reminder Management
+ ReminderSettingsView - Modern Clean UI Design
  
- Features Implemented:
+ Features:
+ ✅ Modern card-based layout matching TodayView
+ ✅ Clean white background design
  ✅ Walk reminder time management (add, edit, delete)
  ✅ Enable/disable individual reminders
  ✅ Smart notification toggle
  ✅ Notification permission management
- ✅ Beautiful, modern iOS design
  ✅ Real-time notification status display
  ✅ Custom reminder creation with validation
  ✅ Integration with NotificationService
@@ -43,287 +44,382 @@ struct ReminderSettingsView: View {
     // MARK: - Body
     var body: some View {
         NavigationView {
-            List {
-                notificationStatusSection
-                
-                smartNotificationsSection
-                
-                walkRemindersSection
-                
-                notificationInfoSection
-            }
-            .navigationTitle("Walk Reminders")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Close") {
-                        dismiss()
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Top header
+                    topHeader
+                    
+                    // Main content
+                    VStack(spacing: 20) {
+                        notificationStatusSection
+                        smartNotificationsSection
+                        walkRemindersSection
+                        debugSection
                     }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Add Reminder") {
-                        showingAddReminder = true
-                    }
-                    .disabled(notificationService.authorizationStatus != .authorized)
+                    .padding(.horizontal, 20)
+                    
+                    Spacer(minLength: 60) // Space for bottom navigation
                 }
             }
-            .sheet(isPresented: $showingAddReminder) {
-                AddReminderView(
-                    time: $newReminderTime,
-                    title: $newReminderTitle,
-                    message: $newReminderMessage,
-                    onSave: addNewReminder
-                )
+            .background(Color(.systemBackground))
+            .navigationBarHidden(true)
+        }
+        .sheet(isPresented: $showingAddReminder) {
+            AddReminderView(
+                time: $newReminderTime,
+                title: $newReminderTitle,
+                message: $newReminderMessage,
+                onSave: addNewReminder
+            )
+        }
+        .alert("Notification Permission Required", isPresented: $showingPermissionAlert) {
+            Button("Settings") {
+                openAppSettings()
             }
-            .alert("Notification Permission Required", isPresented: $showingPermissionAlert) {
-                Button("Settings") {
-                    openAppSettings()
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("Please enable notifications in Settings to receive walk reminders for your dog.")
-            }
-            .sheet(isPresented: $showingNotificationSummary) {
-                NotificationSummaryView()
-            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Please enable notifications in Settings to receive walk reminders for your dog.")
+        }
+        .sheet(isPresented: $showingNotificationSummary) {
+            NotificationSummaryView()
         }
         .onAppear {
             notificationService.checkAuthorizationStatus()
         }
     }
     
-    // MARK: - View Sections
+    // MARK: - Top Header
+    private var topHeader: some View {
+        HStack {
+            // Back button
+            Button(action: { dismiss() }) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(.primary)
+            }
+            
+            Spacer()
+            
+            // Title
+            Text("Walk Reminders")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.primary)
+            
+            Spacer()
+            
+            // Add reminder button
+            Button(action: { showingAddReminder = true }) {
+                Image(systemName: "plus")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(notificationService.authorizationStatus == .authorized ? .white : .secondary)
+                    .frame(width: 32, height: 32)
+                    .background(notificationService.authorizationStatus == .authorized ? .blue : Color(.systemGray4))
+                    .cornerRadius(16)
+            }
+            .disabled(notificationService.authorizationStatus != .authorized)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 32)
+        .padding(.bottom, 20)
+    }
     
+    // MARK: - Notification Status Section
     private var notificationStatusSection: some View {
-        Section {
-            HStack {
-                Image(systemName: notificationStatusIcon)
-                    .foregroundStyle(notificationStatusColor)
-                    .font(.title2)
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Notification Status")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(.primary)
+            
+            HStack(spacing: 16) {
+                // Status icon
+                Text(notificationStatusIcon)
+                    .font(.system(size: 24))
+                    .frame(width: 48, height: 48)
+                    .background(notificationStatusColor.opacity(0.2))
+                    .cornerRadius(12)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Notification Status")
-                        .font(.headline)
+                    Text("Notifications")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.primary)
                     
                     Text(notificationStatusText)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 
                 Spacer()
                 
+                // Action button
                 if notificationService.authorizationStatus == .notDetermined {
                     Button("Enable") {
                         Task {
                             await requestNotificationPermission()
                         }
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(.blue)
+                    .cornerRadius(20)
                 } else if notificationService.authorizationStatus == .denied {
                     Button("Settings") {
                         openAppSettings()
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(.blue.opacity(0.1))
+                    .cornerRadius(20)
                 }
             }
-            .padding(.vertical, 8)
-        } header: {
-            Text("Permissions")
+            .padding(16)
+            .background(Color(.systemGray6))
+            .cornerRadius(16)
         }
     }
     
+    // MARK: - Smart Notifications Section
     private var smartNotificationsSection: some View {
-        Section {
-            HStack {
-                Image(systemName: "brain.head.profile")
-                    .foregroundStyle(.purple.gradient)
-                    .font(.title2)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Smart Reminders")
-                        .font(.headline)
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Smart Notifications")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(.primary)
+            
+            VStack(spacing: 16) {
+                HStack(spacing: 16) {
+                    // Brain icon
+                    Image(systemName: "brain.head.profile")
+                        .font(.system(size: 20))
+                        .foregroundColor(.purple)
+                        .frame(width: 40, height: 40)
+                        .background(.purple.opacity(0.2))
+                        .cornerRadius(10)
                     
-                    Text("Get intelligent walk suggestions based on your dog's activity")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Intelligent Alerts")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.primary)
+                        
+                        Text("Get smart walk suggestions based on your dog's activity")
+                            .font(.system(size: 14))
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Spacer()
+                    
+                    // Toggle switch
+                    Toggle("", isOn: .constant(notificationService.isSmartNotificationsEnabled))
+                        .onChange(of: notificationService.isSmartNotificationsEnabled) { newValue in
+                            notificationService.updateSmartNotifications(enabled: newValue)
+                        }
+                        .disabled(notificationService.authorizationStatus != .authorized)
                 }
+                
+                if notificationService.isSmartNotificationsEnabled {
+                    Divider()
+                    
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Smart reminders will notify you when:")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.secondary)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            smartReminderFeature("30% goal not reached by 2 PM", icon: "target")
+                            smartReminderFeature("60% goal not reached by 6 PM", icon: "bolt")
+                            smartReminderFeature("No walks recorded by noon", icon: "exclamationmark.triangle")
+                            smartReminderFeature("Daily goal achieved", icon: "checkmark.circle")
+                        }
+                    }
+                }
+            }
+            .padding(16)
+            .background(Color(.systemGray6))
+            .cornerRadius(16)
+        }
+    }
+    
+    // MARK: - Walk Reminders Section
+    private var walkRemindersSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Walk Reminders")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.primary)
                 
                 Spacer()
                 
-                Toggle("", isOn: Binding(
-                    get: { notificationService.isSmartNotificationsEnabled },
-                    set: { notificationService.updateSmartNotifications(enabled: $0) }
-                ))
-                .disabled(notificationService.authorizationStatus != .authorized)
-            }
-            .padding(.vertical, 8)
-            
-            if notificationService.isSmartNotificationsEnabled {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Smart reminders will notify you when:")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        smartReminderFeature("Your dog hasn't reached 30% of daily goal by 2 PM")
-                        smartReminderFeature("Your dog hasn't reached 60% of daily goal by 6 PM")
-                        smartReminderFeature("No walks have been recorded by noon")
-                        smartReminderFeature("Daily goal is achieved (celebration!)")
-                    }
+                if !notificationService.walkReminders.isEmpty {
+                    Text("\(notificationService.walkReminders.filter { $0.isEnabled }.count) active")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.green)
+                        .cornerRadius(12)
                 }
-                .padding(.top, 8)
             }
-        } header: {
-            Text("Intelligent Notifications")
-        }
-    }
-    
-    private var walkRemindersSection: some View {
-        Section {
+            
+            // Reminders list
             if notificationService.walkReminders.isEmpty {
-                VStack(spacing: 12) {
+                VStack(spacing: 16) {
                     Image(systemName: "bell.slash")
-                        .font(.largeTitle)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 48))
+                        .foregroundColor(.secondary)
                     
                     Text("No Walk Reminders")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(.primary)
                     
-                    Text("Add reminders to get notified when it's time for walks")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    Text("Add reminders to get notified when it's time for walks with your dog")
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 20)
+                .padding(.vertical, 40)
+                .background(Color(.systemGray6))
+                .cornerRadius(16)
             } else {
-                ForEach(notificationService.walkReminders) { reminder in
-                    walkReminderRow(reminder)
-                }
-                .onDelete(perform: deleteReminders)
-            }
-        } header: {
-            HStack {
-                Text("Walk Reminders")
-                Spacer()
-                if !notificationService.walkReminders.isEmpty {
-                    Text("\(notificationService.walkReminders.filter { $0.isEnabled }.count) active")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                VStack(spacing: 12) {
+                    ForEach(notificationService.walkReminders) { reminder in
+                        walkReminderRow(reminder)
+                    }
                 }
             }
         }
     }
     
-    private var notificationInfoSection: some View {
-        Section {
-            Button(action: {
-                showingNotificationSummary = true
-            }) {
-                HStack {
-                    Image(systemName: "info.circle")
-                        .foregroundStyle(.blue)
-                    
-                    Text("View Notification Summary")
-                        .foregroundStyle(.primary)
-                    
-                    Spacer()
-                    
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(.secondary)
-                        .font(.caption)
-                }
-            }
-            
-            Button(action: {
-                Task {
-                    await testSmartReminder()
-                }
-            }) {
-                HStack {
-                    Image(systemName: "testtube.2")
-                        .foregroundStyle(.orange)
-                    
-                    Text("Test Smart Reminder")
-                        .foregroundStyle(.primary)
-                    
-                    Spacer()
-                }
-            }
-            .disabled(notificationService.authorizationStatus != .authorized)
-        } header: {
+    // MARK: - Debug Section
+    private var debugSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Debug & Testing")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(.primary)
+            
+            VStack(spacing: 12) {
+                // View notification summary
+                debugButton(
+                    icon: "chart.bar",
+                    title: "View Notification Summary",
+                    action: { showingNotificationSummary = true }
+                )
+                
+                // Test smart reminder
+                debugButton(
+                    icon: "testtube.2",
+                    title: "Test Smart Reminder",
+                    action: {
+                        Task {
+                            await testSmartReminder()
+                        }
+                    },
+                    disabled: notificationService.authorizationStatus != .authorized
+                )
+            }
         }
     }
     
     // MARK: - Helper Views
     
+    private func smartReminderFeature(_ text: String, icon: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundColor(.purple)
+                .frame(width: 20)
+            
+            Text(text)
+                .font(.system(size: 14))
+                .foregroundColor(.secondary)
+        }
+    }
+    
     private func walkReminderRow(_ reminder: WalkReminder) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(reminder.title)
-                    .font(.headline)
-                    .foregroundStyle(reminder.isEnabled ? .primary : .secondary)
-                
+        HStack(spacing: 16) {
+            // Time
+            VStack(alignment: .leading, spacing: 2) {
                 Text(reminder.time, style: .time)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .foregroundColor(.primary)
                 
-                if !reminder.message.isEmpty {
-                    Text(reminder.message)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                }
+                Text(reminder.title)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.secondary)
             }
             
             Spacer()
             
-            VStack(spacing: 8) {
-                Toggle("", isOn: Binding(
-                    get: { reminder.isEnabled },
-                    set: { _ in notificationService.toggleReminder(reminder) }
-                ))
-                .disabled(notificationService.authorizationStatus != .authorized)
-                
-                if reminder.repeatDaily {
-                    Text("Daily")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+            // Days indicator (if we have recurring reminders)
+            HStack(spacing: 4) {
+                ForEach(["S", "M", "T", "W", "T", "F", "S"], id: \.self) { day in
+                    Text(day)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(.white)
+                        .frame(width: 20, height: 20)
+                        .background(.blue.opacity(0.7))
+                        .cornerRadius(10)
                 }
             }
+            
+            // Toggle
+            Toggle("", isOn: .constant(reminder.isEnabled))
+                .onChange(of: reminder.isEnabled) { _ in
+                    notificationService.toggleReminder(reminder)
+                }
+                .disabled(notificationService.authorizationStatus != .authorized)
         }
-        .padding(.vertical, 4)
-        .opacity(reminder.isEnabled ? 1.0 : 0.6)
+        .padding(16)
+        .background(reminder.isEnabled ? Color(.systemGray6) : Color(.systemGray6).opacity(0.6))
+        .cornerRadius(12)
+        .opacity(reminder.isEnabled ? 1.0 : 0.7)
     }
     
-    private func smartReminderFeature(_ text: String) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.green)
-                .font(.caption)
-                .padding(.top, 2)
-            
-            Text(text)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+    private func debugButton(
+        icon: String,
+        title: String,
+        action: @escaping () -> Void,
+        disabled: Bool = false
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 16) {
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                    .foregroundColor(.orange)
+                    .frame(width: 32, height: 32)
+                    .background(.orange.opacity(0.2))
+                    .cornerRadius(8)
+                
+                Text(title)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.primary)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
+            }
+            .padding(16)
+            .background(disabled ? Color(.systemGray6).opacity(0.5) : Color(.systemGray6))
+            .cornerRadius(12)
         }
+        .disabled(disabled)
     }
     
     // MARK: - Helper Properties
     
     private var notificationStatusIcon: String {
         switch notificationService.authorizationStatus {
-        case .authorized: return "checkmark.circle.fill"
-        case .denied: return "xmark.circle.fill"
-        case .notDetermined: return "questionmark.circle.fill"
-        case .provisional: return "clock.circle.fill"
-        case .ephemeral: return "timer.circle.fill"
-        @unknown default: return "exclamationmark.circle.fill"
+        case .authorized: return "✅"
+        case .denied: return "❌"
+        case .notDetermined: return "❓"
+        case .provisional: return "🕐"
+        case .ephemeral: return "⏱️"
+        @unknown default: return "⚠️"
         }
     }
     
@@ -332,9 +428,7 @@ struct ReminderSettingsView: View {
         case .authorized: return .green
         case .denied: return .red
         case .notDetermined: return .orange
-        case .provisional: return .blue
-        case .ephemeral: return .purple
-        @unknown default: return .gray
+        default: return .gray
         }
     }
     
@@ -343,7 +437,7 @@ struct ReminderSettingsView: View {
         case .authorized: return "Notifications enabled - you'll receive walk reminders"
         case .denied: return "Notifications disabled - enable in Settings to receive reminders"
         case .notDetermined: return "Tap 'Enable' to allow walk reminder notifications"
-        case .provisional: return "Quiet notifications enabled - reminders will appear in Notification Center"
+        case .provisional: return "Quiet notifications enabled - reminders will appear in notification center"
         case .ephemeral: return "Temporary notification access"
         @unknown default: return "Unknown notification status"
         }
@@ -406,45 +500,104 @@ struct AddReminderView: View {
     
     var body: some View {
         NavigationView {
-            Form {
-                Section("Reminder Time") {
-                    DatePicker("Time", selection: $time, displayedComponents: .hourAndMinute)
-                        .datePickerStyle(.wheel)
-                }
-                
-                Section("Reminder Details") {
-                    TextField("Title (optional)", text: $title)
-                        .placeholder(when: title.isEmpty) {
-                            Text("Walk Time! 🐕").foregroundStyle(.secondary)
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Top header
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.primary)
                         }
-                    
-                    TextField("Message (optional)", text: $message, axis: .vertical)
-                        .lineLimit(2...4)
-                        .placeholder(when: message.isEmpty) {
-                            Text("Time for a walk with your dog!").foregroundStyle(.secondary)
+                        
+                        Spacer()
+                        
+                        Text("New Reminder")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        Button("Save") {
+                            onSave()
+                            dismiss()
                         }
-                    
-                    Toggle("Repeat Daily", isOn: $repeatDaily)
-                }
-                
-                Section {
-                    Button("Save Reminder") {
-                        onSave()
-                        dismiss()
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.blue)
                     }
-                    .frame(maxWidth: .infinity)
-                    .buttonStyle(.borderedProminent)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 32)
+                    .padding(.bottom, 20)
+                    
+                    // Form content
+                    VStack(spacing: 24) {
+                        // Time picker section
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Reminder Time")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.primary)
+                            
+                            DatePicker("Time", selection: $time, displayedComponents: .hourAndMinute)
+                                .datePickerStyle(.wheel)
+                                .padding(16)
+                                .background(Color(.systemGray6))
+                                .cornerRadius(16)
+                        }
+                        
+                        // Title section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Title")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.primary)
+                            
+                            TextField("Walk Time! 🐕", text: $title)
+                                .font(.system(size: 16))
+                                .padding(16)
+                                .background(Color(.systemGray6))
+                                .cornerRadius(12)
+                        }
+                        
+                        // Message section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Message")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.primary)
+                            
+                            TextField("Time for a walk with your dog!", text: $message, axis: .vertical)
+                                .font(.system(size: 16))
+                                .lineLimit(3...6)
+                                .padding(16)
+                                .background(Color(.systemGray6))
+                                .cornerRadius(12)
+                        }
+                        
+                        // Repeat option
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Repeat")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.primary)
+                            
+                            HStack {
+                                Text("Repeat daily")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.primary)
+                                
+                                Spacer()
+                                
+                                Toggle("", isOn: $repeatDaily)
+                            }
+                            .padding(16)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(12)
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    
+                    Spacer(minLength: 60)
                 }
             }
-            .navigationTitle("New Reminder")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-            }
+            .background(Color(.systemBackground))
+            .navigationBarHidden(true)
         }
     }
 }
@@ -458,61 +611,92 @@ struct NotificationSummaryView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 20) {
-                    // Status overview
-                    VStack(spacing: 16) {
-                        Text("Notification Summary")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
+                VStack(spacing: 0) {
+                    // Top header
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.primary)
+                        }
                         
-                        Text(notificationService.getNotificationSummary())
-                            .font(.body)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                            .background(.quaternary.opacity(0.5))
-                            .cornerRadius(12)
+                        Spacer()
+                        
+                        Text("Debug Info")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        Spacer()
+                            .frame(width: 32)
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 32)
+                    .padding(.bottom, 20)
                     
-                    // Pending notifications
-                    if !pendingNotifications.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Scheduled Notifications")
-                                .font(.headline)
+                    // Content
+                    VStack(spacing: 24) {
+                        // Status overview
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Notification Summary")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.primary)
                             
-                            ForEach(pendingNotifications, id: \.identifier) { notification in
-                                pendingNotificationCard(notification)
-                            }
+                            Text(notificationService.getNotificationSummary())
+                                .font(.system(size: 16))
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.leading)
+                                .padding(16)
+                                .background(Color(.systemGray6))
+                                .cornerRadius(12)
                         }
-                    }
-                    
-                    // Actions
-                    VStack(spacing: 12) {
-                        Button("Refresh Status") {
-                            Task {
-                                await loadPendingNotifications()
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                        .frame(maxWidth: .infinity)
                         
-                        Button("Clear Badge Count") {
-                            notificationService.clearBadgeCount()
+                        // Pending notifications
+                        if !pendingNotifications.isEmpty {
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("Scheduled Notifications")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(.primary)
+                                
+                                ForEach(pendingNotifications, id: \.identifier) { notification in
+                                    pendingNotificationCard(notification)
+                                }
+                            }
                         }
-                        .buttonStyle(.bordered)
-                        .frame(maxWidth: .infinity)
+                        
+                        // Actions
+                        VStack(spacing: 12) {
+                            Button("Refresh Status") {
+                                Task {
+                                    await loadPendingNotifications()
+                                }
+                            }
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(16)
+                            .background(.blue)
+                            .cornerRadius(12)
+                            
+                            Button("Clear Badge Count") {
+                                notificationService.clearBadgeCount()
+                            }
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.orange)
+                            .frame(maxWidth: .infinity)
+                            .padding(16)
+                            .background(.orange.opacity(0.1))
+                            .cornerRadius(12)
+                        }
                     }
-                }
-                .padding()
-            }
-            .navigationTitle("Debug Info")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
+                    .padding(.horizontal, 20)
+                    
+                    Spacer(minLength: 60)
                 }
             }
+            .background(Color(.systemBackground))
+            .navigationBarHidden(true)
         }
         .onAppear {
             Task {
@@ -522,23 +706,30 @@ struct NotificationSummaryView: View {
     }
     
     private func pendingNotificationCard(_ notification: UNNotificationRequest) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             Text(notification.content.title)
-                .font(.headline)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.primary)
             
             Text(notification.content.body)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 14))
+                .foregroundColor(.secondary)
             
             if let trigger = notification.trigger as? UNCalendarNotificationTrigger {
-                Text("Scheduled: \(trigger.nextTriggerDate()?.formatted() ?? "Unknown")")
-                    .font(.caption)
-                    .foregroundStyle(.blue)
+                HStack {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 12))
+                        .foregroundColor(.blue)
+                    
+                    Text("Scheduled: \(trigger.nextTriggerDate()?.formatted() ?? "Unknown")")
+                        .font(.system(size: 12))
+                        .foregroundColor(.blue)
+                }
             }
         }
-        .padding()
-        .background(.ultraThinMaterial)
-        .cornerRadius(8)
+        .padding(16)
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
     }
     
     private func loadPendingNotifications() async {

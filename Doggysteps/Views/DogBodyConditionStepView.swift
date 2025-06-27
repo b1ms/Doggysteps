@@ -12,15 +12,27 @@ struct DogBodyConditionStepView: View {
     @State private var selectedCondition: DogBodyCondition?
     
     var body: some View {
-        VStack(spacing: 30) {
-            // Title
-            VStack(spacing: 16) {
-                Text("What does \(viewModel.dogName)'s body look like?")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.primary)
-                    .padding(.horizontal)
+        VStack(spacing: 32) {
+            // Header
+            VStack(spacing: 24) {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 60, weight: .medium))
+                    .foregroundColor(.pink)
+                    .frame(width: 100, height: 100)
+                    .background(.pink.opacity(0.1))
+                    .cornerRadius(25)
+                
+                VStack(spacing: 12) {
+                    Text("What does \(viewModel.dogName.isEmpty ? "your dog" : viewModel.dogName)'s body look like?")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.center)
+                    
+                    Text("This helps us calculate more accurate step estimates")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
             }
             
             // Body condition options
@@ -29,85 +41,98 @@ struct DogBodyConditionStepView: View {
                     bodyConditionOption(condition)
                 }
             }
-            .padding(.horizontal)
-            
-            Spacer()
         }
-        .padding(.top, 40)
         .onAppear {
             selectedCondition = viewModel.selectedBodyCondition
         }
     }
     
     private func bodyConditionOption(_ condition: DogBodyCondition) -> some View {
-        VStack(spacing: 12) {
-            // Dog silhouette representation
-            HStack(spacing: 20) {
-                // Show 3 dog silhouettes with different emphasis
-                ForEach(0..<3, id: \.self) { index in
-                    dogSilhouette(
-                        isSelected: shouldHighlightSilhouette(condition: condition, index: index),
-                        condition: condition,
-                        index: index
-                    )
+        Button(action: {
+            selectCondition(condition)
+        }) {
+            VStack(spacing: 20) {
+                // Dog silhouette representation
+                HStack(spacing: 24) {
+                    ForEach(0..<3, id: \.self) { index in
+                        dogSilhouette(
+                            isSelected: shouldHighlightSilhouette(condition: condition, index: index),
+                            condition: condition,
+                            index: index
+                        )
+                    }
+                }
+                .padding(.vertical, 16)
+                
+                // Condition title and description
+                VStack(spacing: 8) {
+                    Text(condition.rawValue)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.primary)
+                    
+                    Text(condition.description)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(2)
+                }
+                
+                // Selection indicator
+                if selectedCondition == condition {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.blue)
+                        Text("Selected")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.blue)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(.blue.opacity(0.1))
+                    .cornerRadius(12)
                 }
             }
-            .padding(.vertical, 16)
-            
-            // Condition title and description
-            VStack(spacing: 8) {
-                Text(condition.rawValue)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Text(condition.description)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
+            .padding(.vertical, 24)
+            .padding(.horizontal, 20)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(selectedCondition == condition ? Color.blue.opacity(0.1) : Color(.systemGray6))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(
+                                selectedCondition == condition ? Color.blue : Color.clear,
+                                lineWidth: 2
+                            )
+                    )
+            )
         }
-        .padding(.vertical, 20)
-        .padding(.horizontal, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(selectedCondition == condition ? Color.blue.opacity(0.1) : Color.gray.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(
-                            selectedCondition == condition ? Color.blue : Color.clear,
-                            lineWidth: 2
-                        )
-                )
-        )
-        .onTapGesture {
-            selectCondition(condition)
-        }
+        .buttonStyle(PlainButtonStyle())
     }
     
     private func dogSilhouette(isSelected: Bool, condition: DogBodyCondition, index: Int) -> some View {
-        // Simple dog shape representation
-        VStack(spacing: 4) {
+        VStack(spacing: 6) {
             // Head
             Circle()
-                .frame(width: 20, height: 20)
+                .frame(width: 16, height: 16)
             
             // Body - varies based on condition
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 6)
                 .frame(
                     width: bodyWidth(condition: condition, index: index),
-                    height: 30
+                    height: 24
                 )
             
             // Legs
             HStack(spacing: 2) {
                 ForEach(0..<4, id: \.self) { _ in
                     Rectangle()
-                        .frame(width: 3, height: 12)
+                        .frame(width: 2, height: 10)
                 }
             }
         }
         .foregroundColor(isSelected ? .blue : .gray.opacity(0.4))
+        .scaleEffect(isSelected ? 1.1 : 1.0)
+        .animation(.easeInOut(duration: 0.2), value: isSelected)
     }
     
     private func shouldHighlightSilhouette(condition: DogBodyCondition, index: Int) -> Bool {
@@ -122,7 +147,7 @@ struct DogBodyConditionStepView: View {
     }
     
     private func bodyWidth(condition: DogBodyCondition, index: Int) -> CGFloat {
-        let baseWidths: [CGFloat] = [25, 35, 45] // skinny, normal, chubby
+        let baseWidths: [CGFloat] = [20, 28, 36] // skinny, normal, chubby
         return baseWidths[index]
     }
     

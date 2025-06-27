@@ -6,15 +6,16 @@
 //
 
 /*
- Modern Tab Navigation with Black & White Minimalist Theme
+ Translucent Tab Navigation (Weather App Style)
  
  Features:
- ✅ Bottom tab navigation with 3 main views
+ ✅ Bottom tab navigation with translucent styling
  ✅ Today view (main dashboard)
- ✅ History view (step tracking history)
+ ✅ History view (step tracking history)  
  ✅ Start Dog Walk view (workout tracking)
- ✅ Black & white minimalist design
- ✅ Clean monochromatic styling
+ ✅ Triangle indicator for active tab
+ ✅ SF Symbols icons without text
+ ✅ Translucent background effect
  */
 
 import SwiftUI
@@ -28,64 +29,99 @@ struct MainAppView: View {
     
     // MARK: - Body
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // Today Tab
-            TodayView()
-                .environmentObject(homeViewModel)
-                .tabItem {
-                    Image(systemName: selectedTab == .today ? "house.fill" : "house")
-                    Text("Today")
-                }
-                .tag(TabSelection.today)
+        ZStack {
+            // Main TabView
+            TabView(selection: $selectedTab) {
+                // Today Tab
+                TodayView()
+                    .environmentObject(homeViewModel)
+                    .tabItem {
+                        EmptyView()
+                    }
+                    .tag(TabSelection.today)
+                
+                // History Tab
+                HistoryView()
+                    .environmentObject(homeViewModel)
+                    .tabItem {
+                        EmptyView()
+                    }
+                    .tag(TabSelection.history)
+                
+                // Start Dog Walk Tab
+                StartDogWalkView()
+                    .environmentObject(homeViewModel)
+                    .tabItem {
+                        EmptyView()
+                    }
+                    .tag(TabSelection.startWalk)
+            }
             
-            // History Tab
-            HistoryView()
-                .environmentObject(homeViewModel)
-                .tabItem {
-                    Image(systemName: selectedTab == .history ? "calendar.circle.fill" : "calendar.circle")
-                    Text("History")
-                }
-                .tag(TabSelection.history)
-            
-            // Start Dog Walk Tab
-            StartDogWalkView()
-                .environmentObject(homeViewModel)
-                .tabItem {
-                    Image(systemName: selectedTab == .startWalk ? "figure.walk.circle.fill" : "figure.walk.circle")
-                    Text("Start Dog Walk")
-                }
-                .tag(TabSelection.startWalk)
+            // Custom Navigation Bar Overlay
+            VStack {
+                Spacer()
+                customNavigationBar
+            }
         }
-        .accentColor(.primary)
         .onAppear {
-            setupTabBarAppearance()
+            // Hide the default tab bar
+            UITabBar.appearance().isHidden = true
         }
     }
     
+    // MARK: - Custom Navigation Bar
+    private var customNavigationBar: some View {
+        VStack(spacing: 0) {
+            // Navigation bar with clear background (floating effect)
+            HStack(spacing: 0) {
+                ForEach(TabSelection.allCases, id: \.self) { tab in
+                    Button(action: {
+                        selectedTab = tab
+                    }) {
+                        VStack(spacing: 4) {
+                            Image(systemName: tab.icon)
+                                .font(.system(size: 20, weight: .medium))
+                                .foregroundColor(selectedTab == tab ? .primary : .secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                    }
+                }
+            }
+            .background(Color.clear) // Clear background for floating effect
+            
+            // Triangle indicator underneath the SF symbols, pointing up toward them
+            HStack {
+                ForEach(TabSelection.allCases, id: \.self) { tab in
+                    if tab == selectedTab {
+                        Image(systemName: "arrowtriangle.up.fill")
+                            .font(.system(size: 8))
+                            .foregroundColor(.primary)
+                    } else {
+                        Color.clear
+                            .frame(height: 8)
+                    }
+                    
+                    if tab != TabSelection.allCases.last {
+                        Spacer()
+                    }
+                }
+            }
+            .padding(.horizontal, getTabHorizontalPadding())
+            .padding(.top, 2)
+            .padding(.bottom, 8)
+            .animation(.easeInOut(duration: 0.3), value: selectedTab)
+        }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+    }
+    
     // MARK: - Helper Methods
-    private func setupTabBarAppearance() {
-        // Minimalist tab bar styling
-        let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor.systemBackground
-        appearance.shadowColor = UIColor.systemGray5
-        
-        // Selected tab styling - black
-        appearance.stackedLayoutAppearance.selected.iconColor = UIColor.label
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
-            .foregroundColor: UIColor.label,
-            .font: UIFont.systemFont(ofSize: 12, weight: .medium)
-        ]
-        
-        // Normal tab styling - gray
-        appearance.stackedLayoutAppearance.normal.iconColor = UIColor.systemGray2
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
-            .foregroundColor: UIColor.systemGray2,
-            .font: UIFont.systemFont(ofSize: 12, weight: .regular)
-        ]
-        
-        UITabBar.appearance().standardAppearance = appearance
-        UITabBar.appearance().scrollEdgeAppearance = appearance
+    private func getTabHorizontalPadding() -> CGFloat {
+        // Calculate padding to align triangle with tab icons
+        let screenWidth = UIScreen.main.bounds.width
+        let availableWidth = screenWidth
+        let tabWidth = availableWidth / CGFloat(TabSelection.allCases.count)
+        return (tabWidth / 2) - 4 // 4 is half the triangle width
     }
 }
 
@@ -106,8 +142,8 @@ enum TabSelection: String, CaseIterable {
     var icon: String {
         switch self {
         case .today: return "house"
-        case .history: return "calendar.circle"
-        case .startWalk: return "figure.walk.circle"
+        case .history: return "calendar"
+        case .startWalk: return "figure.walk"
         }
     }
     

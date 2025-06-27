@@ -6,15 +6,16 @@
 //
 
 /*
- Start Dog Walk View - Minimalist Black & White Design
+ Start Dog Walk View - Modern Fitness App UI
  
  Features:
- ✅ Large "Start Workout" button with minimal styling
+ ✅ Clean modern design matching TodayView
+ ✅ Large action button with modern styling
  ✅ Real-time step tracking using CoreMotion during active walks only
  ✅ Dog step calculation only during active walk sessions
  ✅ Walk session management and data persistence
- ✅ Clean monochromatic interface
- ✅ No background estimation or HealthKit dependency
+ ✅ Card-based metrics layout
+ ✅ Consistent with TodayView aesthetics
  */
 
 import SwiftUI
@@ -36,41 +37,43 @@ struct StartDogWalkView: View {
     // Core Motion - Using centralized service only
     private let coreMotionService = CoreMotionService.shared
     
-    // MARK: - Computed Properties
-    private var isWalkingActive: Bool {
-        return currentWalkSession?.isActive == true
-    }
-    
     // MARK: - Body
     var body: some View {
-        ScrollView {
-            VStack(spacing: 40) {
-                // Header
-                headerSection
-                
-                // Main action button
-                mainActionButton
-                
-                // Current session info
-                if let session = currentWalkSession {
-                    currentSessionCard(session)
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Top header
+                    topHeader
+                    
+                    // Main content
+                    VStack(spacing: 24) {
+                        // Header section
+                        headerSection
+                        
+                        // Main action button
+                        mainActionButton
+                        
+                        // Current session info
+                        if let session = currentWalkSession {
+                            currentSessionCard(session)
+                        }
+                        
+                        // Recent walks section
+                        recentWalksSection
+                        
+                        // Dog profile prompt if needed
+                        if viewModel.dogProfile == nil {
+                            profilePromptSection
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    
+                    Spacer(minLength: 60) // Space for bottom navigation
                 }
-                
-                // Recent walks section
-                recentWalksSection
-                
-                // Dog profile prompt if needed
-                if viewModel.dogProfile == nil {
-                    profilePromptSection
-                }
-                
-                Spacer(minLength: 100)
             }
-            .padding(.horizontal, 20)
+            .background(Color(.systemBackground))
+            .navigationBarHidden(true)
         }
-        .background(Color(.systemBackground))
-        .navigationTitle("Start Walk")
-        .navigationBarTitleDisplayMode(.large)
         .sheet(isPresented: $showingProfileSheet) {
             ProfileView()
         }
@@ -94,131 +97,284 @@ struct StartDogWalkView: View {
         }
     }
     
-    // MARK: - View Components
+    // MARK: - Top Header
+    private var topHeader: some View {
+        HStack {
+            // Walk status indicator
+            if currentWalkSession?.isActive == true {
+                HStack(spacing: 4) {
+                    Circle()
+                        .fill(.red)
+                        .frame(width: 8, height: 8)
+                        .scaleEffect(1.2)
+                        .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: currentWalkSession?.isActive == true)
+                    Text("Walking")
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundColor(.primary)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                                 .background(Color.red.opacity(0.15))
+                .cornerRadius(16)
+            }
+            
+            Spacer()
+            
+            // Profile button
+            Button(action: { showingProfileSheet = true }) {
+                Circle()
+                    .fill(.brown.opacity(0.3))
+                    .frame(width: 32, height: 32)
+                    .overlay {
+                        Text("🐕")
+                            .font(.system(size: 16))
+                    }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 32)
+        .padding(.bottom, 16)
+    }
     
+    // MARK: - Header Section
     private var headerSection: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "figure.walk.circle")
-                .font(.system(size: 64))
-                .foregroundStyle(.primary)
+        VStack(spacing: 16) {
+            // Walking icon
+            Image(systemName: "figure.walk")
+                .font(.system(size: 48, weight: .medium))
+                .foregroundColor(.blue)
+                .frame(width: 80, height: 80)
+                .background(Color.blue.opacity(0.1))
+                .cornerRadius(40)
             
             VStack(spacing: 8) {
-                Text("Ready for a Walk?")
-                    .font(.title2)
-                    .fontWeight(.light)
-                    .foregroundStyle(.primary)
-                    .tracking(0.5)
+                Text(currentWalkSession?.isActive == true ? "Walk in Progress" : "Ready for a Walk?")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
                 
                 if let dogName = viewModel.dogProfile?.name {
-                    Text("Time to take \(dogName) out for some exercise!")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    Text(currentWalkSession?.isActive == true ? "Keep going with \(dogName)!" : "Time to take \(dogName) out!")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
-                        .tracking(0.3)
                 }
             }
         }
     }
     
+    // MARK: - Main Action Button
     private var mainActionButton: some View {
         Button(action: {
-            if isWalkingActive {
+            if currentWalkSession != nil {
                 stopWalk()
             } else {
                 startWalk()
             }
         }) {
-            VStack(spacing: 16) {
-                Image(systemName: isWalkingActive ? "stop.circle" : "play.circle")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.primary)
+            HStack(spacing: 16) {
+                // Icon matching TodayView metric card style
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(buttonBackgroundColor.opacity(0.2))
+                        .frame(width: 48, height: 48)
+                    
+                    Image(systemName: buttonIcon)
+                        .font(.system(size: 24, weight: .medium))
+                        .foregroundColor(buttonIconColor)
+                }
                 
-                Text(isWalkingActive ? "Stop Walk" : "Start Walk")
-                    .font(.title3)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.primary)
-                    .tracking(0.5)
+                // Content
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(buttonTitle)
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+                    
+                    Text(buttonSubtitle)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                // Arrow indicator
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.secondary)
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 160)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(.primary.opacity(isWalkingActive ? 0.6 : 0.3), lineWidth: isWalkingActive ? 2 : 1)
-                    .fill(Color(.systemGray6).opacity(isWalkingActive ? 0.1 : 0.05))
-            )
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .background(buttonBackgroundColor.opacity(0.1))
+            .cornerRadius(16)
         }
-        .scaleEffect(isWalkingActive ? 1.02 : 1.0)
-        .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isWalkingActive)
+        .buttonStyle(PlainButtonStyle())
     }
     
+    // MARK: - Button Properties
+    private var buttonIcon: String {
+        guard let session = currentWalkSession else { return "play.fill" }
+        return session.isActive ? "stop.fill" : "play.fill"
+    }
+    
+    private var buttonIconColor: Color {
+        guard let session = currentWalkSession else { return .green }
+        return session.isActive ? .red : .green
+    }
+    
+    private var buttonBackgroundColor: Color {
+        guard let session = currentWalkSession else { return .green }
+        return session.isActive ? .red : .green
+    }
+    
+    private var buttonTitle: String {
+        guard let session = currentWalkSession else { return "Start Walk" }
+        return session.isActive ? "Stop Walk" : "Start Walk"
+    }
+    
+    private var buttonSubtitle: String {
+        guard let session = currentWalkSession else { return "Begin tracking steps" }
+        return session.isActive ? "End current session" : "Begin tracking steps"
+    }
+    
+    // MARK: - Current Session Card
     private func currentSessionCard(_ session: WalkSession) -> some View {
         VStack(spacing: 20) {
-            VStack(spacing: 8) {
-                Text("Active Walk Session")
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.primary)
-                    .tracking(0.5)
-                
-                // Live activity indicator
-                HStack(spacing: 6) {
-                    Circle()
-                        .fill(.primary)
-                        .frame(width: 8, height: 8)
-                        .scaleEffect(1.2)
-                        .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isWalkingActive)
+            // Session header
+            HStack {
+                                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(Color.red)
+                            .frame(width: 8, height: 8)
+                            .scaleEffect(1.3)
+                            .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: currentWalkSession?.isActive == true)
                     
-                    Text("LIVE")
-                        .font(.caption2)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.primary)
-                        .tracking(1)
+                    Text("Active Session")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.primary)
                 }
+                
+                Spacer()
+                
+                Text("LIVE")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                                     .padding(.vertical, 4)
+                 .background(Color.red)
+                 .cornerRadius(8)
             }
             
-            VStack(spacing: 12) {
-                HStack {
-                    SessionMetric(icon: "clock", value: session.formattedDuration, title: "Duration")
-                    Spacer()
-                    SessionMetric(icon: "figure.walk", value: "\(session.humanSteps)", title: "Steps")
-                }
+            // Session metrics
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: 12),
+                GridItem(.flexible(), spacing: 12)
+            ], spacing: 16) {
+                sessionMetricCard(
+                    icon: "clock.fill",
+                    title: "Duration",
+                    value: session.formattedDuration,
+                    backgroundColor: .blue.opacity(0.1),
+                    iconColor: .blue
+                )
                 
-                HStack {
-                    SessionMetric(icon: "pawprint", value: "\(session.estimatedDogSteps)", title: "Dog Steps")
-                    Spacer()
-                    SessionMetric(icon: "location", value: String(format: "%.1f km", session.distanceInKilometers), title: "Distance")
-                }
+                sessionMetricCard(
+                    icon: "person.fill",
+                    title: "Human Steps",
+                    value: "\(session.humanSteps)",
+                    backgroundColor: .orange.opacity(0.1),
+                    iconColor: .orange
+                )
+                
+                sessionMetricCard(
+                    icon: "pawprint.fill",
+                    title: "Dog Steps",
+                    value: "\(session.estimatedDogSteps)",
+                    backgroundColor: .green.opacity(0.1),
+                    iconColor: .green
+                )
+                
+                sessionMetricCard(
+                    icon: "location.fill",
+                    title: "Distance",
+                    value: String(format: "%.1f km", session.distanceInKilometers),
+                    backgroundColor: .purple.opacity(0.1),
+                    iconColor: .purple
+                )
             }
         }
         .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(.secondary.opacity(0.2), lineWidth: 1)
-                .fill(Color(.systemGray6).opacity(0.1))
-        )
+        .background(Color(.systemGray6))
+        .cornerRadius(20)
     }
     
+    // MARK: - Session Metric Card
+    private func sessionMetricCard(
+        icon: String,
+        title: String,
+        value: String,
+        backgroundColor: Color,
+        iconColor: Color
+    ) -> some View {
+        VStack(spacing: 12) {
+            // Icon
+            Image(systemName: icon)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(iconColor)
+                .frame(width: 32, height: 32)
+                .background(iconColor.opacity(0.2))
+                .cornerRadius(8)
+            
+            // Value and title
+            VStack(spacing: 4) {
+                Text(value)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
+                
+                Text(title)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .padding(.horizontal, 12)
+        .background(backgroundColor)
+        .cornerRadius(12)
+    }
+    
+    // MARK: - Recent Walks Section
     private var recentWalksSection: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Recent Walks")
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.primary)
-                    .tracking(0.5)
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.primary)
                 Spacer()
             }
             
             if viewModel.todaysWalkSessions.isEmpty {
-                Text("No walks today yet")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.quaternary.opacity(0.3))
-                    .cornerRadius(12)
+                VStack(spacing: 16) {
+                    Image(systemName: "figure.walk.circle")
+                        .font(.system(size: 48))
+                        .foregroundColor(.secondary)
+                    
+                    VStack(spacing: 8) {
+                        Text("No walks today yet")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.primary)
+                        
+                        Text("Start your first walk to see it here")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 32)
+                .background(Color(.systemGray6))
+                .cornerRadius(16)
             } else {
-                LazyVStack(spacing: 8) {
+                VStack(spacing: 12) {
                     ForEach(viewModel.todaysWalkSessions.reversed(), id: \.id) { session in
                         recentWalkRow(session)
                     }
@@ -227,62 +383,81 @@ struct StartDogWalkView: View {
         }
     }
     
+    // MARK: - Recent Walk Row
     private func recentWalkRow(_ session: WalkSession) -> some View {
-        HStack {
-            Image(systemName: "figure.walk.circle.fill")
-                .foregroundStyle(.blue)
+        HStack(spacing: 16) {
+            // Walk icon
+            Image(systemName: "figure.walk")
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(.blue)
+                .frame(width: 40, height: 40)
+                .background(Color.blue.opacity(0.1))
+                .cornerRadius(8)
             
-            VStack(alignment: .leading, spacing: 2) {
+            // Walk details
+            VStack(alignment: .leading, spacing: 4) {
                 Text("\(session.estimatedDogSteps) dog steps")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundColor(.primary)
                 
                 Text(session.formattedDuration)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.secondary)
             }
             
             Spacer()
             
-            VStack(alignment: .trailing, spacing: 2) {
+            // Time
+            VStack(alignment: .trailing, spacing: 4) {
                 Text(session.startTime, style: .time)
-                    .font(.caption)
-                    .foregroundStyle(.primary)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.primary)
                 
                 Text(session.startTime, style: .date)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.secondary)
             }
         }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(.quaternary.opacity(0.3))
-        .cornerRadius(8)
+        .padding(16)
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
     }
     
+    // MARK: - Profile Prompt Section
     private var profilePromptSection: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 20) {
             Image(systemName: "person.crop.circle.badge.plus")
-                .font(.system(size: 40))
-                .foregroundStyle(.orange.gradient)
+                .font(.system(size: 48, weight: .medium))
+                .foregroundColor(.orange)
             
-            Text("Create Dog Profile")
-                .font(.headline)
-                .fontWeight(.semibold)
-            
-            Text("Set up your dog's profile to get accurate step calculations during walks.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+            VStack(spacing: 8) {
+                Text("Create Profile")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.primary)
+                
+                Text("Set up your dog's profile to get accurate step calculations during walks.")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
             
             Button("Create Profile") {
                 showingProfileSheet = true
             }
-            .buttonStyle(.borderedProminent)
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundColor(.white)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 12)
+            .background(Color.orange)
+            .cornerRadius(12)
         }
-        .padding()
-        .background(.orange.opacity(0.1))
-        .cornerRadius(16)
+        .padding(24)
+        .background(Color.orange.opacity(0.1))
+        .cornerRadius(20)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+        )
     }
     
     // MARK: - Walk Management Methods
@@ -296,22 +471,24 @@ struct StartDogWalkView: View {
             return
         }
         
-        print("🚶 [StartDogWalkView] Profile found: \(profile.name)")
+        guard currentWalkSession == nil else {
+            print("⚠️ [StartDogWalkView] Walk already in progress")
+            return
+        }
         
         // Create new walk session
         let breedMultiplier = viewModel.getBreedMultiplier(for: profile.breedName)
-        print("🚶 [StartDogWalkView] Breed multiplier: \(breedMultiplier)")
-        
-        currentWalkSession = WalkSession(
+        var newSession = WalkSession(
             breedName: profile.breedName,
             breedMultiplier: breedMultiplier
         )
-        
+        newSession.isActive = true
+        currentWalkSession = newSession
         walkStartTime = Date()
         
         print("✅ [StartDogWalkView] Walk session started for \(profile.name)")
         
-        // Start CoreMotion tracking only
+        // Start CoreMotion tracking
         startPedometerTracking()
     }
     
@@ -357,7 +534,7 @@ struct StartDogWalkView: View {
     }
     
     private func updateSessionFromCoreMotion() {
-        guard var session = currentWalkSession else { return }
+        guard var session = currentWalkSession, session.isActive else { return }
         
         // Get current session data from CoreMotionService
         if let sessionData = coreMotionService.getCurrentSessionData() {
@@ -379,109 +556,123 @@ struct StartDogWalkView: View {
     private func stopWalk() {
         print("🛑 [StartDogWalkView] Stopping dog walk")
         
-        // Stop timer
+        guard let session = currentWalkSession, session.isActive else {
+            print("⚠️ [StartDogWalkView] No active walk session")
+            return
+        }
+        
+        // Stop timer immediately
         walkTimer?.invalidate()
         walkTimer = nil
         
         // Stop walk session via CoreMotionService
         if let sessionData = coreMotionService.stopWalkSession() {
             // Finalize walk session with data from CoreMotionService
-            if var session = currentWalkSession {
-                session.endTime = sessionData.endTime ?? Date()
-                session.isActive = false
-                session.usedHealthKit = false // CoreMotion only
-                session.dataSource = "CoreMotion"
-                session.duration = sessionData.duration
-                session.humanSteps = sessionData.steps
-                session.estimatedDogSteps = Int(Double(session.humanSteps) * session.breedMultiplier)
-                session.distanceInMeters = sessionData.distance
-                
-                // Save completed walk session
-                viewModel.saveCompletedWalkSession(session)
-                print("✅ [StartDogWalkView] Walk completed: \(session.estimatedDogSteps) dog steps in \(session.formattedDuration)")
-            }
-        } else {
-            print("⚠️ [StartDogWalkView] No session data available from CoreMotionService")
+            var finalSession = session
+            finalSession.endTime = sessionData.endTime ?? Date()
+            finalSession.isActive = false
+            finalSession.usedHealthKit = false
+            finalSession.dataSource = "CoreMotion"
+            finalSession.duration = sessionData.duration
+            finalSession.humanSteps = sessionData.steps
+            finalSession.estimatedDogSteps = Int(Double(finalSession.humanSteps) * finalSession.breedMultiplier)
+            finalSession.distanceInMeters = sessionData.distance
+            
+            // Save completed walk session
+            viewModel.saveCompletedWalkSession(finalSession)
+            print("✅ [StartDogWalkView] Walk completed: \(finalSession.estimatedDogSteps) dog steps in \(finalSession.formattedDuration)")
         }
         
+        // Clear session state
         currentWalkSession = nil
         walkStartTime = nil
+        
+        print("🛑 [StartDogWalkView] Session stopped and cleared")
     }
 }
 
-// MARK: - Walk Options View
+// MARK: - Walk Options View (Modern Theme)
 struct WalkOptionsView: View {
     let onStartWalk: () -> Void
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 30) {
-                VStack(spacing: 16) {
-                    Image(systemName: "figure.walk.circle.fill")
-                        .font(.system(size: 60))
-                        .foregroundStyle(.green.gradient)
-                    
-                    Text("Start Dog Walk")
-                        .font(.title)
-                        .fontWeight(.bold)
-                    
-                    Text("Track your dog's steps in real-time")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                
-                VStack(spacing: 16) {
-                    walkOption(
-                        icon: "figure.walk",
-                        title: "Step Tracking",
-                        description: "Real-time pedometer tracking during walks",
-                        isEnabled: true
-                    )
-                    
-                    walkOption(
-                        icon: "location",
-                        title: "Distance Tracking",
-                        description: "Accurate distance from device sensors",
-                        isEnabled: true
-                    )
-                    
-                    walkOption(
-                        icon: "timer",
-                        title: "Duration Tracking",
-                        description: "Monitor walk duration and pace",
-                        isEnabled: true
-                    )
-                }
-                
-                VStack(spacing: 12) {
-                    Text("How it works:")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("• Uses your phone's built-in pedometer for accurate step counting")
-                        Text("• Dog steps are calculated using breed-specific multipliers")
-                        Text("• All data is saved when you complete the walk")
+            ScrollView {
+                VStack(spacing: 32) {
+                    // Header
+                    VStack(spacing: 16) {
+                        Image(systemName: "figure.walk")
+                            .font(.system(size: 60, weight: .medium))
+                            .foregroundColor(.blue)
+                                                     .frame(width: 80, height: 80)
+                         .background(Color.blue.opacity(0.1))
+                         .cornerRadius(40)
+                        
+                        VStack(spacing: 8) {
+                            Text("Start Dog Walk")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.primary)
+                            
+                            Text("Track your dog's steps in real-time")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.secondary)
+                        }
                     }
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    
+                    // Features
+                    VStack(spacing: 16) {
+                        walkFeature(
+                            icon: "figure.walk",
+                            title: "Step Tracking",
+                            description: "Real-time pedometer tracking during walks"
+                        )
+                        
+                        walkFeature(
+                            icon: "location.fill",
+                            title: "Distance Tracking",
+                            description: "Accurate distance from device sensors"
+                        )
+                        
+                        walkFeature(
+                            icon: "clock.fill",
+                            title: "Duration Tracking",
+                            description: "Monitor walk duration and pace"
+                        )
+                    }
+                    
+                    // How it works
+                    VStack(spacing: 16) {
+                        Text("How It Works")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.primary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            InfoRow(text: "Uses your phone's built-in pedometer for accurate step counting")
+                            InfoRow(text: "Dog steps are calculated using breed-specific multipliers")
+                            InfoRow(text: "All data is saved when you complete the walk")
+                        }
+                    }
+                    .padding(20)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(16)
+                    
+                    // Start button
+                    Button("Start Walk") {
+                        onStartWalk()
+                        dismiss()
+                    }
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                                 .background(Color.blue)
+             .cornerRadius(12)
                 }
-                .padding()
-                .background(.quaternary.opacity(0.3))
-                .cornerRadius(12)
-                
-                Spacer()
-                
-                Button("Start Walk") {
-                    onStartWalk()
-                    dismiss()
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .frame(maxWidth: .infinity)
+                .padding(20)
             }
-            .padding()
+            .background(Color(.systemBackground))
             .navigationTitle("Walk Options")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -494,56 +685,82 @@ struct WalkOptionsView: View {
         }
     }
     
-    private func walkOption(icon: String, title: String, description: String, isEnabled: Bool) -> some View {
+    private func walkFeature(icon: String, title: String, description: String) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(isEnabled ? .blue : .orange)
-                .frame(width: 32)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(.blue)
+                                 .frame(width: 40, height: 40)
+                 .background(Color.blue.opacity(0.1))
+                 .cornerRadius(8)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.primary)
                 
                 Text(description)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.secondary)
             }
             
             Spacer()
             
-            Image(systemName: isEnabled ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                .foregroundStyle(isEnabled ? .green : .orange)
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 20))
+                .foregroundColor(.green)
         }
         .padding(16)
-        .background(.quaternary.opacity(0.3))
+        .background(Color(.systemGray6))
         .cornerRadius(12)
     }
 }
 
-// MARK: - Session Metric Component
+// MARK: - Info Row
+struct InfoRow: View {
+    let text: String
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+                         Circle()
+                 .fill(Color.blue)
+                 .frame(width: 6, height: 6)
+                .padding(.top, 6)
+            
+            Text(text)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Spacer(minLength: 0)
+        }
+    }
+}
+
+// MARK: - Session Metric Component (Modern Theme)
 struct SessionMetric: View {
     let icon: String
     let value: String
     let title: String
     
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.headline)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 24, weight: .medium))
+                .foregroundColor(.blue)
             
             Text(value)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundStyle(.primary)
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundColor(.primary)
             
             Text(title)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .tracking(0.5)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.secondary)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
     }
 }
 

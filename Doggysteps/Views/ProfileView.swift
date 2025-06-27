@@ -6,18 +6,15 @@
 //
 
 /*
- Phase 6 Complete: ProfileView for Dog Profile Management
+ ProfileView - Modern Clean UI Design
  
- Features Implemented:
- ✅ View current dog profile information
- ✅ Edit dog name with validation
- ✅ Edit dog breed with searchable picker
- ✅ Edit dog age with picker interface
- ✅ Real-time validation and error handling
- ✅ Beautiful, modern iOS design
- ✅ Integration with PersistenceController
- ✅ Automatic saving with feedback
- ✅ Cancel/Save workflow with confirmations
+ Features:
+ ✅ Modern card-based layout matching TodayView
+ ✅ Clean white background design
+ ✅ Rounded corners and subtle shadows
+ ✅ Consistent spacing and typography
+ ✅ Colorful accent colors for different sections
+ ✅ Beautiful metric cards for profile information
  */
 
 import SwiftUI
@@ -48,81 +45,69 @@ struct ProfileView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 24) {
-                    headerSection
+                VStack(spacing: 0) {
+                    // Top header
+                    topHeader
                     
-                    if let profile = homeViewModel.dogProfile {
-                        if isEditing {
-                            editingSection
+                    // Profile content
+                    VStack(spacing: 20) {
+                        if let profile = homeViewModel.dogProfile {
+                            if isEditing {
+                                editingSection
+                            } else {
+                                profileInfoSection(profile)
+                            }
+                            
+                            if !isEditing {
+                                actionButtonsSection
+                            }
                         } else {
-                            profileInfoSection(profile)
-                        }
-                        
-                        actionButtonsSection
-                    } else {
-                        if isEditing {
-                            editingSection
-                        } else {
-                            createProfileSection
+                            if isEditing {
+                                editingSection
+                            } else {
+                                createProfileSection
+                            }
                         }
                     }
-                }
-                .padding()
-            }
-            .navigationTitle("Dog Profile")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Close") {
-                        if isEditing && hasChanges {
-                            showingSaveConfirmation = true
-                        } else {
-                            dismiss()
-                        }
-                    }
-                }
-                
-                if homeViewModel.dogProfile != nil {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(isEditing ? "Cancel" : "Edit") {
-                            toggleEditing()
-                        }
-                        .foregroundStyle(isEditing ? .red : .blue)
-                    }
+                    .padding(.horizontal, 20)
+                    
+                    Spacer(minLength: 60) // Space for bottom navigation
                 }
             }
-            .sheet(isPresented: $showingBreedPicker) {
-                BreedPickerView(selectedBreed: $editingBreed, searchText: $searchBreedText)
+            .background(Color(.systemBackground))
+            .navigationBarHidden(true)
+        }
+        .sheet(isPresented: $showingBreedPicker) {
+            BreedPickerView(selectedBreed: $editingBreed, searchText: $searchBreedText)
+        }
+        .alert("Save Changes?", isPresented: $showingSaveConfirmation) {
+            Button("Save") {
+                saveChanges()
+                dismiss()
             }
-            .alert("Save Changes?", isPresented: $showingSaveConfirmation) {
-                Button("Save") {
-                    saveChanges()
-                    dismiss()
-                }
-                Button("Discard") {
-                    dismiss()
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("You have unsaved changes. Do you want to save them before closing?")
+            Button("Discard") {
+                dismiss()
             }
-            .alert("Delete Profile?", isPresented: $showingDeleteConfirmation) {
-                Button("Delete", role: .destructive) {
-                    homeViewModel.deleteProfile()
-                    dismiss()
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("This will permanently delete your dog's profile and all associated data. This action cannot be undone.")
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("You have unsaved changes. Do you want to save them before closing?")
+        }
+        .alert("Delete Profile?", isPresented: $showingDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                homeViewModel.deleteProfile()
+                dismiss()
             }
-            .alert("Reset Onboarding?", isPresented: $showingResetOnboardingConfirmation) {
-                Button("Reset", role: .destructive) {
-                    resetOnboarding()
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("This will reset the app to show the onboarding flow again. Your current profile will be deleted.")
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This will permanently delete your dog's profile and all associated data. This action cannot be undone.")
+        }
+        .alert("Reset Onboarding?", isPresented: $showingResetOnboardingConfirmation) {
+            Button("Reset", role: .destructive) {
+                resetOnboarding()
             }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This will reset the app to show the onboarding flow again. Your current profile will be deleted.")
         }
         .onAppear {
             print("🐕 [ProfileView] View appeared")
@@ -132,212 +117,269 @@ struct ProfileView: View {
         }
     }
     
-    // MARK: - View Components
-    
-    private var headerSection: some View {
-        VStack(spacing: 16) {
-            // Dog avatar
-            ZStack {
-                Circle()
-                    .fill(.blue.gradient)
-                    .frame(width: 120, height: 120)
-                
-                Image(systemName: "pawprint.fill")
-                    .font(.system(size: 50))
-                    .foregroundStyle(.white)
-            }
-            .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
-            
-            if let profile = homeViewModel.dogProfile {
-                VStack(spacing: 4) {
-                    Text(profile.name)
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.primary)
-                    
-                                    Text("\(profile.breedName) • \(profile.bodyCondition.rawValue)")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
+    // MARK: - Top Header
+    private var topHeader: some View {
+        HStack {
+            // Back button
+            Button(action: {
+                if isEditing && hasChanges {
+                    showingSaveConfirmation = true
+                } else {
+                    dismiss()
                 }
-            } else {
-                VStack(spacing: 4) {
-                    Text("Create Profile")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.primary)
-                    
-                    Text("Tell us about your dog")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-    }
-    
-    private func profileInfoSection(_ profile: DogProfile) -> some View {
-        VStack(spacing: 20) {
-            // Profile information cards
-            profileInfoCard(
-                title: "Name",
-                value: profile.name,
-                icon: "tag.fill",
-                color: .blue
-            )
-            
-            profileInfoCard(
-                title: "Breed",
-                value: profile.breedName,
-                icon: "pawprint.fill",
-                color: .green
-            )
-            
-            profileInfoCard(
-                title: "Body Condition",
-                value: profile.bodyCondition.rawValue,
-                icon: "heart.fill",
-                color: .orange
-            )
-            
-            // Profile stats
-            profileStatsSection(profile)
-        }
-    }
-    
-    private func profileInfoCard(title: String, value: String, icon: String, color: Color) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(color.gradient)
-                .frame(width: 32)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
-                    .tracking(1)
-                
-                Text(value)
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primary)
+            }) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(.primary)
             }
             
             Spacer()
+            
+            // Title
+            Text("Dog Profile")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.primary)
+            
+            Spacer()
+            
+            // Edit/Save button
+            if homeViewModel.dogProfile != nil {
+                Button(action: {
+                    if isEditing {
+                        if canSave {
+                            saveChanges()
+                        } else {
+                            toggleEditing()
+                        }
+                    } else {
+                        toggleEditing()
+                    }
+                }) {
+                    Text(isEditing ? (canSave ? "Save" : "Cancel") : "Edit")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(isEditing ? (canSave ? .white : .primary) : .primary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(isEditing ? (canSave ? .blue : Color(.systemGray6)) : Color(.systemGray6))
+                        .cornerRadius(20)
+                }
+            }
         }
-        .padding()
-        .background(.ultraThinMaterial)
+        .padding(.horizontal, 20)
+        .padding(.top, 32)
+        .padding(.bottom, 20)
+    }
+    
+    // MARK: - Profile Info Section
+    private func profileInfoSection(_ profile: DogProfile) -> some View {
+        VStack(spacing: 20) {
+            // Profile header card
+            profileHeaderCard(profile)
+            
+            // Profile metrics
+            Text("Profile Details")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            // Profile info cards
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: 16),
+                GridItem(.flexible(), spacing: 16)
+            ], spacing: 16) {
+                profileMetricCard(
+                    icon: "tag.fill",
+                    title: "Name",
+                    value: profile.name,
+                    backgroundColor: .blue.opacity(0.1),
+                    iconColor: .blue
+                )
+                
+                profileMetricCard(
+                    icon: "pawprint.fill",
+                    title: "Breed",
+                    value: profile.breedName,
+                    backgroundColor: .green.opacity(0.1),
+                    iconColor: .green
+                )
+                
+                profileMetricCard(
+                    icon: "heart.fill",
+                    title: "Condition",
+                    value: profile.bodyCondition.rawValue,
+                    backgroundColor: .orange.opacity(0.1),
+                    iconColor: .orange
+                )
+                
+                profileMetricCard(
+                    icon: "calendar",
+                    title: "Created",
+                    value: profile.createdAt.formatted(.dateTime.day().month(.abbreviated)),
+                    backgroundColor: .purple.opacity(0.1),
+                    iconColor: .purple
+                )
+            }
+            
+            // Breed details if available
+            if let breedInfo = profile.breedInfo {
+                breedDetailsSection(breedInfo)
+            }
+        }
+    }
+    
+    // MARK: - Profile Header Card
+    private func profileHeaderCard(_ profile: DogProfile) -> some View {
+        VStack(spacing: 16) {
+            // Dog avatar
+            Circle()
+                .fill(.brown.opacity(0.2))
+                .frame(width: 80, height: 80)
+                .overlay {
+                    Text("🐕")
+                        .font(.system(size: 40))
+                }
+            
+            // Dog name and breed
+            VStack(spacing: 4) {
+                Text(profile.name)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
+                
+                Text(profile.breedName)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+        .background(Color(.systemGray6))
         .cornerRadius(16)
     }
     
-    private func profileStatsSection(_ profile: DogProfile) -> some View {
-        VStack(spacing: 16) {
-            Text("Profile Details")
-                .font(.headline)
+    // MARK: - Profile Metric Card
+    private func profileMetricCard(
+        icon: String,
+        title: String,
+        value: String,
+        backgroundColor: Color,
+        iconColor: Color
+    ) -> some View {
+        VStack(spacing: 12) {
+            // Icon
+            Image(systemName: icon)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(iconColor)
+                .frame(width: 32, height: 32)
+                .background(iconColor.opacity(0.2))
+                .cornerRadius(8)
+            
+            // Value and title
+            VStack(spacing: 4) {
+                Text(value)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+                
+                Text(title)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .padding(.horizontal, 12)
+        .background(backgroundColor)
+        .cornerRadius(12)
+    }
+    
+    // MARK: - Breed Details Section
+    private func breedDetailsSection(_ breedInfo: BreedInfo) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Breed Information")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
             VStack(spacing: 12) {
-                HStack {
-                    Text("Created:")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Text(profile.createdAt, style: .date)
-                        .fontWeight(.medium)
-                }
-                
-                HStack {
-                    Text("Last Updated:")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Text(profile.updatedAt, style: .relative)
-                        .fontWeight(.medium)
-                }
-                
-                if let breedInfo = profile.breedInfo {
-                    Divider()
-                    
-                    HStack {
-                        Text("Breed Info:")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(breedInfo.size)
-                            .fontWeight(.medium)
-                    }
-                    
-                    HStack {
-                        Text("Energy Level:")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(breedInfo.energyLevel)
-                            .fontWeight(.medium)
-                    }
-                    
-                    HStack {
-                        Text("Step Multiplier:")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text("\(String(format: "%.1f", breedInfo.stepMultiplier))x")
-                            .fontWeight(.medium)
-                    }
-                }
+                breedDetailRow(label: "Size", value: breedInfo.size)
+                Divider()
+                breedDetailRow(label: "Energy Level", value: breedInfo.energyLevel)
+                Divider()
+                breedDetailRow(label: "Step Multiplier", value: String(format: "%.1fx", breedInfo.stepMultiplier))
             }
-            .font(.subheadline)
-            .padding()
-            .background(.quaternary.opacity(0.5))
+            .padding(16)
+            .background(Color(.systemGray6))
             .cornerRadius(12)
         }
     }
     
+    // MARK: - Breed Detail Row
+    private func breedDetailRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            Text(value)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.primary)
+        }
+    }
+    
+    // MARK: - Editing Section
     private var editingSection: some View {
         VStack(spacing: 24) {
-            Text("Edit Profile")
-                .font(.headline)
+            Text(homeViewModel.dogProfile == nil ? "Create Profile" : "Edit Profile")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
             VStack(spacing: 20) {
                 // Name field
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Dog's Name")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.primary)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.primary)
                     
                     TextField("Enter your dog's name", text: $editingName)
-                        .textFieldStyle(.roundedBorder)
-                        .font(.body)
+                        .font(.system(size: 16))
+                        .padding(16)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
                 }
                 
                 // Breed field
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Breed")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.primary)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.primary)
                     
                     Button(action: {
                         showingBreedPicker = true
                     }) {
                         HStack {
                             Text(editingBreed.isEmpty ? "Select breed" : editingBreed)
-                                .foregroundStyle(editingBreed.isEmpty ? .secondary : .primary)
-                            
-                            Spacer()
+                                .font(.system(size: 16))
+                                .foregroundColor(editingBreed.isEmpty ? .secondary : .primary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             
                             Image(systemName: "chevron.down")
-                                .foregroundStyle(.secondary)
+                                .font(.system(size: 14))
+                                .foregroundColor(.secondary)
                         }
-                        .padding()
-                        .background(.quaternary.opacity(0.5))
-                        .cornerRadius(8)
+                        .padding(16)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
                     }
                 }
                 
                 // Body Condition field
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Body Condition")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.primary)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.primary)
                     
                     Picker("Body Condition", selection: $editingBodyCondition) {
                         ForEach(DogBodyCondition.allCases, id: \.self) { condition in
@@ -346,8 +388,6 @@ struct ProfileView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    .background(.quaternary.opacity(0.3))
-                    .cornerRadius(8)
                 }
             }
             
@@ -357,16 +397,17 @@ struct ProfileView: View {
                     ForEach(validationErrors, id: \.self) { error in
                         HStack {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.red)
+                                .font(.system(size: 14))
+                                .foregroundColor(.red)
                             Text(error)
-                                .font(.caption)
-                                .foregroundStyle(.red)
+                                .font(.system(size: 14))
+                                .foregroundColor(.red)
                         }
                     }
                 }
-                .padding()
+                .padding(16)
                 .background(.red.opacity(0.1))
-                .cornerRadius(8)
+                .cornerRadius(12)
             }
             
             // Save button
@@ -375,13 +416,14 @@ struct ProfileView: View {
                 saveChanges()
             }) {
                 HStack {
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 16, weight: .medium))
                     Text(homeViewModel.dogProfile == nil ? "Create Profile" : "Save Changes")
+                        .font(.system(size: 16, weight: .semibold))
                 }
-                .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-                .padding()
+                .padding(16)
                 .background(canSave ? .blue : .gray)
                 .cornerRadius(12)
             }
@@ -389,74 +431,72 @@ struct ProfileView: View {
         }
     }
     
+    // MARK: - Create Profile Section
     private var createProfileSection: some View {
         VStack(spacing: 24) {
-            Text("Welcome to Doggysteps!")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .multilineTextAlignment(.center)
-            
-            Text("Let's create your dog's profile to get personalized step tracking and activity recommendations.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            
-            VStack(spacing: 12) {
-                Button("Create Profile") {
-                    print("🐕 [ProfileView] Create Profile button tapped")
-                    isEditing = true
-                    setupEditingFields()
-                    print("🐕 [ProfileView] isEditing set to: \(isEditing)")
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                
-
-            }
-        }
-        .padding()
-        .background(.quaternary.opacity(0.3))
-        .cornerRadius(16)
-    }
-    
-    private var actionButtonsSection: some View {
-        VStack(spacing: 16) {
-            if homeViewModel.dogProfile != nil && !isEditing {
-                VStack(spacing: 12) {
-                    
-                    Button("Delete Profile") {
-                        showingDeleteConfirmation = true
+            VStack(spacing: 16) {
+                // Dog avatar placeholder
+                Circle()
+                    .fill(.brown.opacity(0.2))
+                    .frame(width: 100, height: 100)
+                    .overlay {
+                        Text("🐕")
+                            .font(.system(size: 50))
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.large)
-                    .foregroundStyle(.red)
-                    .frame(maxWidth: .infinity)
+                
+                VStack(spacing: 8) {
+                    Text("Welcome to Doggysteps!")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.primary)
+                    
+                    Text("Let's create your dog's profile to get personalized step tracking and activity recommendations.")
+                        .font(.system(size: 16))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
                 }
             }
+            .padding(24)
+            .background(Color(.systemGray6))
+            .cornerRadius(16)
             
-            // Development section
-            developmentSection
+            Button("Create Profile") {
+                print("🐕 [ProfileView] Create Profile button tapped")
+                isEditing = true
+                setupEditingFields()
+                print("🐕 [ProfileView] isEditing set to: \(isEditing)")
+            }
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(16)
+            .background(.blue)
+            .cornerRadius(12)
         }
     }
     
-    private var developmentSection: some View {
+    // MARK: - Action Buttons Section
+    private var actionButtonsSection: some View {
         VStack(spacing: 12) {
-            Text("Development")
-                .font(.headline)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
             Button("Reset Onboarding") {
                 showingResetOnboardingConfirmation = true
             }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .foregroundStyle(.orange)
+            .font(.system(size: 16, weight: .medium))
+            .foregroundColor(.orange)
             .frame(maxWidth: .infinity)
+            .padding(16)
+            .background(.orange.opacity(0.1))
+            .cornerRadius(12)
+            
+            Button("Delete Profile") {
+                showingDeleteConfirmation = true
+            }
+            .font(.system(size: 16, weight: .medium))
+            .foregroundColor(.red)
+            .frame(maxWidth: .infinity)
+            .padding(16)
+            .background(.red.opacity(0.1))
+            .cornerRadius(12)
         }
-        .padding()
-        .background(.quaternary.opacity(0.3))
-        .cornerRadius(16)
     }
     
     // MARK: - Helper Properties
@@ -573,8 +613,8 @@ struct ProfileView: View {
         } else {
             print("❌ [ProfileView] Failed to reset onboarding")
         }
-    }
-}
+             }
+     }
 
 // MARK: - Breed Picker View
 struct BreedPickerView: View {
@@ -605,25 +645,29 @@ struct BreedPickerView: View {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(breed.name)
-                                    .font(.headline)
-                                    .foregroundStyle(.primary)
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(.primary)
                                 
                                 Text(breed.summary)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(2)
                             }
                             
                             Spacer()
                             
                             if selectedBreed == breed.name {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(.blue)
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.blue)
                             }
                         }
-                        .padding(.vertical, 4)
+                        .padding(.vertical, 8)
                     }
+                    .listRowBackground(Color(.systemBackground))
                 }
             }
+            .background(Color(.systemBackground))
             .navigationTitle("Select Breed")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -631,6 +675,8 @@ struct BreedPickerView: View {
                     Button("Done") {
                         dismiss()
                     }
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.blue)
                 }
             }
         }
@@ -645,23 +691,28 @@ struct SearchBar: View {
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
+                .font(.system(size: 16))
+                .foregroundColor(.secondary)
             
             TextField(placeholder, text: $text)
-                .textFieldStyle(.plain)
+                .font(.system(size: 16))
+                .foregroundColor(.primary)
             
             if !text.isEmpty {
-                Button("Clear") {
+                Button(action: {
                     text = ""
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(.secondary)
                 }
-                .font(.caption)
-                .foregroundStyle(.blue)
             }
         }
-        .padding()
-        .background(.quaternary.opacity(0.5))
-        .cornerRadius(10)
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+        .padding(.horizontal, 20)
     }
 }
 
@@ -725,4 +776,4 @@ class ProfileViewModel: ObservableObject {
 // MARK: - Preview
 #Preview {
     ProfileView()
-} 
+}
