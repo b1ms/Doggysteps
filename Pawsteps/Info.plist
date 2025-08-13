@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSMotionUsageDescription</key>
+	<string>This app uses motion data to track your dog's steps and activity during walks.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app uses location data to track distance during walks with your dog.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>This app can send walk reminders that you set up to help maintain your dog's daily activity routine.</string>
+</dict>
+</plist>

@@ -12,8 +12,8 @@
 	"argv": [
 		"/opt/homebrew/bin/xcode-build-server"
 	],
-	"workspace": "/Users/Work/Desktop/Doggysteps/Doggysteps.xcodeproj/project.xcworkspace",
-	"build_root": "/Users/Work/Library/Developer/Xcode/DerivedData/Doggysteps-aicgswlvikjuxgdbwqoxhsvsnvqc",
-	"scheme": "Doggysteps",
+	"workspace": "/Users/Work/Desktop/Pawsteps/Pawsteps.xcodeproj/project.xcworkspace",
+	"build_root": "/Users/Work/Library/Developer/Xcode/DerivedData/Pawsteps-fkdqmxppnamdkqdozfhirmndhlcz",
+	"scheme": "Pawsteps",
 	"kind": "xcode"
 }

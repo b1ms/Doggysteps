@@ -1,0 +1,902 @@
+[
+  {
+    "name": "Affenpinscher",
+    "description": "Small, sturdy toy breed with a monkey-like expression",
+    "size": "Toy",
+    "physical": {
+      "averageLegLengthCm": 11,
+      "averageWeightKg": 4,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.2,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Afghan Hound",
+    "description": "Elegant, independent sighthound with flowing coat",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 38,
+      "averageWeightKg": 25,
+      "bodyType": "elongated"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Airedale Terrier",
+    "description": "King of Terriers, largest of the terrier breeds",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 30,
+      "averageWeightKg": 23,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Akita",
+    "description": "Large, powerful Japanese breed with dignified bearing",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 35,
+      "averageWeightKg": 45,
+      "bodyType": "heavy"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Alapaha Blue Blood Bulldog",
+    "description": "Rare American bulldog breed with protective instincts",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 28,
+      "averageWeightKg": 35,
+      "bodyType": "heavy"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Alaskan Malamute",
+    "description": "Arctic sled dog built for strength and endurance",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 32,
+      "averageWeightKg": 38,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "veryHigh"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "American Bull Staffy",
+    "description": "Muscular, athletic bull-type terrier",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 26,
+      "averageWeightKg": 28,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "American Bulldog",
+    "description": "Powerful working breed with strong protective instincts",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 30,
+      "averageWeightKg": 40,
+      "bodyType": "heavy"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "American Bully",
+    "description": "Compact, muscular breed with gentle temperament",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 22,
+      "averageWeightKg": 30,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "American Cocker Spaniel",
+    "description": "Sporting dog with silky coat and gentle nature",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 20,
+      "averageWeightKg": 13,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Anatolian Shepherd",
+    "description": "Large livestock guardian with independent nature",
+    "size": "Extra Large",
+    "physical": {
+      "averageLegLengthCm": 38,
+      "averageWeightKg": 55,
+      "bodyType": "heavy"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Aussiedoodle",
+    "description": "Australian Shepherd and Poodle mix with high intelligence",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 26,
+      "averageWeightKg": 20,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Australian Cattle Dog",
+    "description": "Energetic herding dog built for endurance",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 24,
+      "averageWeightKg": 18,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "veryHigh"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Australian Kelpie",
+    "description": "Tireless working dog with exceptional herding ability",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 25,
+      "averageWeightKg": 16,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "veryHigh"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Australian Labradoodle",
+    "description": "Labrador and Poodle mix with friendly temperament",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 28,
+      "averageWeightKg": 22,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Australian Shepherd",
+    "description": "Intelligent herding dog with strong work drive",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 26,
+      "averageWeightKg": 25,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "veryHigh"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Australian Silky Terrier",
+    "description": "Small terrier with silky coat and alert expression",
+    "size": "Toy",
+    "physical": {
+      "averageLegLengthCm": 12,
+      "averageWeightKg": 4,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.2,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Australian Terrier",
+    "description": "Small, sturdy terrier with weather-resistant coat",
+    "size": "Small",
+    "physical": {
+      "averageLegLengthCm": 13,
+      "averageWeightKg": 6,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.2,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Azawakh",
+    "description": "African sighthound with elegant, lean build",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 38,
+      "averageWeightKg": 20,
+      "bodyType": "elongated"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Barbet",
+    "description": "French water dog with curly, woolly coat",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 26,
+      "averageWeightKg": 22,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Basenji",
+    "description": "Barkless hunting dog from Central Africa",
+    "size": "Small",
+    "physical": {
+      "averageLegLengthCm": 20,
+      "averageWeightKg": 10,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Basset Bleu de Gascogne",
+    "description": "French scent hound with distinctive blue-ticked coat",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 18,
+      "averageWeightKg": 18,
+      "bodyType": "elongated"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Basset Fauve de Bretagne",
+    "description": "Small French basset with rough, fawn-colored coat",
+    "size": "Small",
+    "physical": {
+      "averageLegLengthCm": 17,
+      "averageWeightKg": 16,
+      "bodyType": "elongated"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Basset Griffon Vendéen",
+    "description": "French scent hound with rough, tousled coat",
+    "size": "Small",
+    "physical": {
+      "averageLegLengthCm": 18,
+      "averageWeightKg": 18,
+      "bodyType": "elongated"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Basset Hound",
+    "description": "Low-slung scent hound with exceptional tracking ability",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 16,
+      "averageWeightKg": 25,
+      "bodyType": "elongated"
+    },
+    "movement": {
+      "energyLevel": "low"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Bavarian Mountain Hound",
+    "description": "German scent hound specialized for tracking wounded game",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 24,
+      "averageWeightKg": 22,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Beagle",
+    "description": "Medium-sized scent hound with friendly temperament",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 20,
+      "averageWeightKg": 13,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Beaglier",
+    "description": "Beagle and Cavalier King Charles Spaniel mix",
+    "size": "Small",
+    "physical": {
+      "averageLegLengthCm": 18,
+      "averageWeightKg": 12,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Bearded Collie",
+    "description": "Shaggy herding dog with bouncy, enthusiastic nature",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 26,
+      "averageWeightKg": 23,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Beauceron",
+    "description": "Large French herding dog with protective instincts",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 32,
+      "averageWeightKg": 38,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Bedlington Terrier",
+    "description": "Lamb-like terrier with distinctive arched back",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 22,
+      "averageWeightKg": 9,
+      "bodyType": "elongated"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Belgian Shepherd Dog",
+    "description": "Versatile working dog with strong herding instincts",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 28,
+      "averageWeightKg": 28,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "veryHigh"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Bergamasco",
+    "description": "Italian herding dog with distinctive matted coat",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 28,
+      "averageWeightKg": 32,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Bernedoodle",
+    "description": "Bernese Mountain Dog and Poodle mix",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 30,
+      "averageWeightKg": 35,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Bernese Mountain Dog",
+    "description": "Large Swiss working dog with gentle temperament",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 30,
+      "averageWeightKg": 45,
+      "bodyType": "heavy"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Bichon Frise",
+    "description": "Small, cheerful companion with fluffy white coat",
+    "size": "Small",
+    "physical": {
+      "averageLegLengthCm": 14,
+      "averageWeightKg": 6,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.2,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Biewer Terrier",
+    "description": "Small toy terrier with tri-colored silky coat",
+    "size": "Toy",
+    "physical": {
+      "averageLegLengthCm": 10,
+      "averageWeightKg": 3,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.2,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Bloodhound",
+    "description": "Large scent hound with exceptional tracking ability",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 30,
+      "averageWeightKg": 45,
+      "bodyType": "heavy"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Bocker",
+    "description": "Beagle and Cocker Spaniel mix",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 20,
+      "averageWeightKg": 14,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Boerboel",
+    "description": "Large South African mastiff with protective instincts",
+    "size": "Extra Large",
+    "physical": {
+      "averageLegLengthCm": 32,
+      "averageWeightKg": 65,
+      "bodyType": "heavy"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Bolognese",
+    "description": "Small Italian companion with fluffy white coat",
+    "size": "Small",
+    "physical": {
+      "averageLegLengthCm": 12,
+      "averageWeightKg": 4,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "low"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.2,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.1
+    }
+  },
+  {
+    "name": "Borador",
+    "description": "Border Collie and Labrador Retriever mix",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 26,
+      "averageWeightKg": 25,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "veryHigh"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Border Collie",
+    "description": "Highly intelligent herding dog with intense work drive",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 24,
+      "averageWeightKg": 20,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "veryHigh"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Border Terrier",
+    "description": "Small, hardy terrier with otter-like head",
+    "size": "Small",
+    "physical": {
+      "averageLegLengthCm": 18,
+      "averageWeightKg": 6,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Bordoodle",
+    "description": "Border Collie and Poodle mix",
+    "size": "Medium",
+    "physical": {
+      "averageLegLengthCm": 25,
+      "averageWeightKg": 22,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "veryHigh"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Borzoi",
+    "description": "Russian sighthound with elegant, aristocratic bearing",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 40,
+      "averageWeightKg": 35,
+      "bodyType": "elongated"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Boston Terrier",
+    "description": "Small, tuxedo-clad American gentleman",
+    "size": "Small",
+    "physical": {
+      "averageLegLengthCm": 18,
+      "averageWeightKg": 8,
+      "bodyType": "compact"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.15,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Bouvier des Flandres",
+    "description": "Large Belgian herding dog with shaggy coat",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 30,
+      "averageWeightKg": 40,
+      "bodyType": "heavy"
+    },
+    "movement": {
+      "energyLevel": "moderate"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Boxer",
+    "description": "Medium-large working dog with playful spirit",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 28,
+      "averageWeightKg": 30,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  },
+  {
+    "name": "Bracco Italiano",
+    "description": "Italian pointing dog with noble, athletic build",
+    "size": "Large",
+    "physical": {
+      "averageLegLengthCm": 28,
+      "averageWeightKg": 32,
+      "bodyType": "athletic"
+    },
+    "movement": {
+      "energyLevel": "high"
+    },
+    "ageFactors": {
+      "puppyMultiplier": 1.1,
+      "adultMultiplier": 1.0,
+      "seniorMultiplier": 1.05
+    }
+  }
+] 
